@@ -43,4 +43,4 @@ Temporary Items
 .apdisk
 
 #Variables I can't share
-/replace_vars/confidential.py
+.replace_vars.confidential.py
