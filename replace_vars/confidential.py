@@ -1,1 +1,1 @@
-replacements = {'hamburger':'cheesecake', 'potato':'salad'}
+replacements = {'test':'testt'}
