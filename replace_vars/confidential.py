@@ -1,0 +1,1 @@
+replacements = {'hamburger':'cheesecake', 'potato':'salad'}

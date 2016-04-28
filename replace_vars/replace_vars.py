@@ -1,3 +1,5 @@
+import confidential
+
 def inplace_change(filename, old_string, new_string):
         s=open(filename).read()
         if old_string in s:
@@ -10,4 +12,7 @@ def inplace_change(filename, old_string, new_string):
 import os  
 for fn in os.listdir('.'):
      if os.path.isfile(fn):
-        inplace_change(fn, "hamburger","cheesecake")
+        if fn != 'confidential.py':
+            for k, v in confidential.replacements.items():
+                print(k, v)
+                inplace_change(fn, k,v)	
