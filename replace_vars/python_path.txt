@@ -1,4 +1,4 @@
 Console commands used after setting up Python3:
-C:\>set PATH=C:\Python 3.5;%PATH%
+C:\>set PATH=C:\Python35;%PATH%
 C:\>set PYTHONPATH=%PYTHONPATH%;C:\Python35\python.exe
 C:\>python
