@@ -45,3 +45,5 @@ Temporary Items
 #Variables I can't share
 /replace_vars/confidential.py
 /lib/confidential.py
+.lib.confidential_tuples.py
+.lib.confidential.py

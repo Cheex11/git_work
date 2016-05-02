@@ -1,1 +1,0 @@
-tups = ( ('gets_replaces','replacement'))
