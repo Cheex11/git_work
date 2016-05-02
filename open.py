@@ -1,4 +1,5 @@
 from lib import confidential
+from lib import confidential_tuples
 import os
 
 def inplace_change(filename, old_string, new_string):
@@ -10,18 +11,10 @@ def inplace_change(filename, old_string, new_string):
         f.flush()
         f.close()
 
-#for k, v in confidential.replacements.items():
-    #print(k, v)
-
-for fn in os.listdir('C:/Users/Cody/Documents/git_work/q2'):
-    if os.path.isfile(fn):
-        for k, v in confidential.replacements.items():
-            inplace_change(fn, k,v)
-            print('changed!')    
-
 source = 'C:/Users/Cody/Documents/git_work/q2'
 
 for subdir, dirs, files in os.walk(source):
     for f in files:
-       for k, v in confidential.replacements.items():
+        for i, (k, v) in enumerate(confidential_tuples.tups):
             inplace_change(os.path.join(source, f), k,v)
+    
