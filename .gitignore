@@ -47,3 +47,4 @@ Temporary Items
 /lib/confidential.py
 .lib.confidential_tuples.py
 .lib.confidential.py
+lib/confidential_tuples.py
