@@ -16,5 +16,5 @@ source = 'C:/Users/Cody/Documents/git_work/q2'
 for subdir, dirs, files in os.walk(source):
     for f in files:
         for i, (k, v) in enumerate(confidential_tuples.tups):
-            inplace_change(os.path.join(source, f), k,v)
+            inplace_change(os.path.join(subdir, f), k,v)
     

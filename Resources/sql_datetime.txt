@@ -1,1 +1,51 @@
-http://www.sql-server-helper.com/tips/date-formats.aspx
+--http://www.sql-server-helper.com/tips/date-formats.aspx
+
+
+/*Relative Dates*/
+--//These are all functions that will calculate a date relative to the current date and time
+    /*Current Day*/
+    --//now
+    SELECT (GETDATE())
+
+    --//midnight of today
+    SELECT (DATEADD(ms,-4,(DATEADD(dd,DATEDIFF(dd,0,GETDATE()) + 1,0))))
+
+    --//Current Hour
+    SELECT DATEADD(hh,DATEPART(hh,GETDATE()),CAST(FLOOR(CAST(GETDATE() AS FLOAT)) as DateTime))
+
+    --//Current Half-Hour - if its 9:36, this will show 9:30
+    SELECT DATEADD(mi,((DATEDIFF(mi,(CAST(FLOOR(CAST(GETDATE() as FLOAT)) as DateTime)), GETDATE())) / 30) * 30,(CAST(FLOOR(CAST(GETDATE() as FLOAT)) as DateTime)))
+
+    /*Yearly*/
+    --//first datetime of the current year
+    SELECT (DATEADD(yy,DATEDIFF(yy,0,GETDATE()),0))
+
+    --//last datetime of the current year
+    SELECT (DATEADD(ms,-4,(DATEADD(yy,DATEDIFF(yy,0,GETDATE()) + 1,0))))
+
+    /*Monthly*/
+    --//first datetime of current month
+    SELECT (DATEADD(mm,DATEDIFF(mm,0,GETDATE()),0))
+
+    --//last datetime of the current month
+    SELECT (DATEADD(ms,-4,DATEADD(mm,1,DATEADD(mm,DATEDIFF(mm,0,GETDATE()),0))))
+
+    --//first datetime of the previous month
+    SELECT (DATEADD(mm,DATEDIFF(mm,0,GETDATE()) -1,0))
+
+    --//last datetime of the previous month
+    SELECT (DATEADD(ms, -4,DATEADD(mm,DATEDIFF(mm,0,GETDATE()),0)))
+
+    /*Weekly*/
+    --//previous monday at 12AM
+    SELECT (DATEADD(wk,DATEDIFF(wk,0,GETDATE()) -1 ,0))
+
+    --//previous friday at 11:59:59 PM
+    SELECT (DATEADD(ms,-4,DATEADD(dd,5,DATEADD(wk,DATEDIFF(wk,0,GETDATE()) -1 ,0))))
+
+    /*Quarterly*/
+    --//first datetime of current quarter
+    SELECT (DATEADD(qq,DATEDIFF(qq,0,GETDATE()),0))
+
+    --//last datetime of current quarter
+    SELECT (DATEADD(ms,-4,DATEADD(qq,DATEDIFF(qq,0,GETDATE()) + 1,0)))
