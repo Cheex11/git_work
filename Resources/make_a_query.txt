@@ -1,0 +1,23 @@
+							<cfif isdefined('spoof_bottom')>
+								<cfset pull_groups = QueryNew("Adword_groups,
+																	Total_Calls,
+																	Sales_Opps,
+																	Booked_Appt")>
+
+								<!--- populating spreadsheet data --->
+								<cfset newrow = QueryAddRow(pull_groups,3)>
+								<cfset temp = QuerySetCell(pull_groups, "Adword_groups","Group One",1)>
+								<cfset temp = QuerySetCell(pull_groups, "Total_Calls",100,1)>
+								<cfset temp = QuerySetCell(pull_groups, "Sales_Opps",100,1)>
+								<cfset temp = QuerySetCell(pull_groups, "Booked_Appt",30,1)>
+
+								<cfset temp = QuerySetCell(pull_groups, "Adword_groups","Group Two",2)>
+								<cfset temp = QuerySetCell(pull_groups, "Total_Calls",80,2)>
+								<cfset temp = QuerySetCell(pull_groups, "Sales_Opps",60,2)>
+								<cfset temp = QuerySetCell(pull_groups, "Booked_Appt",3,2)>
+
+								<cfset temp = QuerySetCell(pull_groups, "Adword_groups","Group Three",3)>
+								<cfset temp = QuerySetCell(pull_groups, "Total_Calls",20,3)>
+								<cfset temp = QuerySetCell(pull_groups, "Sales_Opps",5,3)>
+								<cfset temp = QuerySetCell(pull_groups, "Booked_Appt",2,3)>
+							</cfif>
