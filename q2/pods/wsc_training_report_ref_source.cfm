@@ -311,15 +311,37 @@
 				</div>
 			</li>
 			<cfoutput query='pull_sources'>
+					<!-- Connected Calls -->
+						<cfset outURLConnected="../cx/clickthrough.cfm?">
+						<cfset outURLConnected=outURLConnected&'this_start='&#URLEncodedFormat(this_start)#>
+						<cfset outURLConnected=outURLConnected&'&this_end='&#URLEncodedFormat(this_end)#>
+						<cfset outURLConnected=outURLConnected&'&WSC_source='&#URLEncodedFormat(siteID)#>
+						<cfset outURLConnected=outURLConnected&'&UTM_Source='&#URLEncodedFormat(utm_source)#>
+					<!-- Sales Opps -->
+						<cfset outURLSales="../cx/clickthrough.cfm?">
+						<cfset outURLSales=outURLSales&'this_start='&#URLEncodedFormat(this_start)#>
+						<cfset outURLSales=outURLSales&'&this_end='&#URLEncodedFormat(this_end)#>
+						<cfset outURLSales=outURLSales&'&WSC_source='&#URLEncodedFormat(siteID)#>
+						<cfset outURLSales=outURLSales&'&UTM_Source='&#URLEncodedFormat(utm_source)#>
+						<cfset outURLSales=outURLSales&'&WSC_hco='&#URLEncodedFormat(sales_opp_hco)#>
+
+					<!-- Appt Requests -->
+						<cfset outURLBooked="../cx/clickthrough.cfm?">
+						<cfset outURLBooked=outURLBooked&'this_start='&#URLEncodedFormat(this_start)#>
+						<cfset outURLBooked=outURLBooked&'&this_end='&#URLEncodedFormat(this_end)#>
+						<cfset outURLBooked=outURLBooked&'&WSC_source='&#URLEncodedFormat(siteID)#>
+						<cfset outURLBooked=outURLBooked&'&UTM_Source='&#URLEncodedFormat(utm_source)#>
+						<cfset outURLBooked=outURLBooked&'&WSC_hco='&#URLEncodedFormat(booked_appt_hco)#>
+						
 				<li class="staff-list-row">
 					<div class="list-block column-1">
 						<p class="lename">#utm_source#</p>
 					</div><div class="list-block column-2 data-cell">
-						<a href="">#Total_Calls#</a>
+						<a href="../thinking.cfm?redirect=#URLEncodedFormat(outURLConnected)#">#Total_Calls#</a>
 					</div><div class="list-block column-3 data-cell">
-						<a href="">#Sales_Opps#</a>
+						<a href="../thinking.cfm?redirect=#URLEncodedFormat(outURLSales)#">#Sales_Opps#</a>
 					</div><div class="list-block column-4 data-cell">
-						<a href="">#Booked_Appt#</a>
+						<a href="../thinking.cfm?redirect=#URLEncodedFormat(outURLBooked)#">#Booked_Appt#</a>
 					</div>
 				</li>
 			</cfoutput>
