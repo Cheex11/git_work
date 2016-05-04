@@ -4,60 +4,69 @@
 	<cfif NOT isDefined('this_start')>
 		<cfif isDefined('SESSION.GIT_variable_CM_start')>
 			<cfset this_start = DateFormat(SESSION.GIT_variable_CM_start,'yyyy-mm-dd')>
+			<!---
 			<script>
 				$('.date-picker-box').text("<cfoutput>#DateFormat(this_start, "mm dd, yyyy")# - #DateFormat(this_end, "mm dd, yyyy")#</cfoutput>")
 				$('.date-picker-box2').text("<cfoutput>#DateFormat(this_start, "mm dd, yyyy")# - #DateFormat(this_end, "mm dd, yyyy")#</cfoutput>")
 				$('.datepicker1').text("<cfoutput>#DateFormat(this_start, "mm dd, yyyy")#</cfoutput>")
 			</script>
+			--->
 		</cfif>
 	</cfif>
 
 	<cfif NOT isDefined('this_end')>
 		<cfif isDefined('SESSION.GIT_variable_CM_end')>
 			<cfset this_end = DateFormat(SESSION.GIT_variable_CM_end,'yyyy-mm-dd')>
+			<!---
 			<script>
 				$('.date-picker-box').text("<cfoutput>#DateFormat(this_start, "mm dd, yyyy")# - #DateFormat(this_end, "mm dd, yyyy")#</cfoutput>")
 				$('.date-picker-box2').text("<cfoutput>#DateFormat(this_start, "mm dd, yyyy")# - #DateFormat(this_end, "mm dd, yyyy")#</cfoutput>")
 				$('.datepicker2').text("<cfoutput>#DateFormat(this_end, "mm dd, yyyy")#</cfoutput>")
 			</script>
+			--->
 		</cfif>
 	</cfif>
 	
 	<cfinclude template="../query_table_call.cfm">
 
-	<cfswitch expression="#session.GIT_variable_CMGIT_verticalID#"> 
-		<cfcase value="1"> 
-			<cfset sales_opp_hco = '60' >
-			<cfset booked_appt_hco = '241060,241061'>
-		</cfcase> 
-		<cfcase value="2"> 
-			<cfset sales_opp_hco = '222670' >
-			<cfset booked_appt_hco = '95'>
-		</cfcase> 
-		<cfcase value="3"> 
-			<cfset sales_opp_hco = '68291' >
-			<cfset booked_appt_hco = '46856,468571'>
-		</cfcase> 
-		<cfcase value="6"> 
-			<cfset sales_opp_hco = '56716' >
-			<cfset booked_appt_hco = '56672,56643'>
-		</cfcase> 
-		<cfcase value="9"> 
-			<cfset sales_opp_hco = '91273' >
-			<cfset booked_appt_hco = '370853,370854'>
-		</cfcase> 
-		<cfcase value="12"> 
-			<cfset sales_opp_hco = '60' >
-			<cfset booked_appt_hco = '241060,241061'>
-		</cfcase>
-		<cfcase value="15"> 
-			<cfset sales_opp_hco = '56716' >
-			<cfset booked_appt_hco = '56672,56643'>
-		</cfcase> 
-	</cfswitch> 
+	<cfif isdefined('session.GIT_variable_CMGIT_verticalID')>
+		<cfswitch expression="#session.GIT_variable_CMGIT_verticalID#"> 
+			<cfcase value="1"> 
+				<cfset sales_opp_hco = '60' >
+				<cfset booked_appt_hco = '241060,241061'>
+			</cfcase> 
+			<cfcase value="2"> 
+				<cfset sales_opp_hco = '222670' >
+				<cfset booked_appt_hco = '95'>
+			</cfcase> 
+			<cfcase value="3"> 
+				<cfset sales_opp_hco = '68291' >
+				<cfset booked_appt_hco = '46856,468571'>
+			</cfcase> 
+			<cfcase value="6"> 
+				<cfset sales_opp_hco = '56716' >
+				<cfset booked_appt_hco = '56672,56643'>
+			</cfcase> 
+			<cfcase value="9"> 
+				<cfset sales_opp_hco = '91273' >
+				<cfset booked_appt_hco = '370853,370854'>
+			</cfcase> 
+			<cfcase value="12"> 
+				<cfset sales_opp_hco = '60' >
+				<cfset booked_appt_hco = '241060,241061'>
+			</cfcase>
+			<cfcase value="15"> 
+				<cfset sales_opp_hco = '56716' >
+				<cfset booked_appt_hco = '56672,56643'>
+			</cfcase> 
+			<cfdefaultcase>
+				<cfset sales_opp_hco = '0' >
+				<cfset booked_appt_hco = '0'>
+			</cfdefaultcase>
+		</cfswitch> 
+	</cfif>
 
 	<cfoutput>
-
 		<cfquery datasource="#GIT_protected_system_variable#" name="pull_websites">
 			SELECT GIT_PhNumpoolid, GIT_name_of_phone_pool
 			FROM GIT_table_that_holds_groups_of_rotating_numbers 
@@ -92,57 +101,85 @@
 		</cfif>	
 
 		<cfquery name='pull_sources' datasource='#application.ds#'>
-			select
-				d.poolmaster as 'GIT_PhNumpoolid', 
-				isnull(d.label4,'No Source Provided') as 'utm_source', 
-				count(distinct c.GIT_ID_for_call) as 'Total_Calls',
-				sum(case when GIT_frn_id_of_humanatic_call_review_question in (#sales_opp_hco#) then 1 else 0 end) AS 'Sales_Opps',
-				sum(case when GIT_frn_id_of_humanatic_call_review_question in (#booked_appt_hco#) then 1 else 0 end) AS 'Booked_Appt'
-			FROM #theTable# c
-				FROM GIT_table_that_holds_numbers d ON c.cf_frn_GIT_PhNumid = d.GIT_PhNumid and add_FROM GIT_account = 20433
-				FROM GIT_table_that_holds_accounts l on d.add_FROM GIT_account = l.FROM GIT_account
-				LEFT JOIN #theTable#_hcat ch on ch.frn_GIT_ID_for_call = c.GIT_ID_for_call
-				FROM GIT_table_that_holds_groups_of_rotating_numbers xdp on d.poolmaster = xdp.GIT_PhNumpoolid
-			WHERE 
-				poolmaster = #siteID#
-				AND c.spamrating = 0
-			GROUP BY d.poolmaster, d.label4
-			ORDER BY count(distinct c.GIT_ID_for_call) desc
+			with the_data as (
+				select
+					d.poolmaster as 'GIT_PhNumpoolid', 
+					isnull(d.label4,'Other Various Sources') as 'utm_source', 
+					count(distinct c.GIT_ID_for_call) as 'Total_Calls',
+					sum(case when GIT_frn_id_of_humanatic_call_review_question in (#sales_opp_hco#) then 1 else 0 end) AS 'Sales_Opps',
+					sum(case when GIT_frn_id_of_humanatic_call_review_question in (#booked_appt_hco#) then 1 else 0 end) AS 'Booked_Appt'
+				FROM #theTable# c
+					FROM GIT_table_that_holds_numbers d ON c.cf_frn_GIT_PhNumid = d.GIT_PhNumid and add_FROM GIT_account = 20433
+					FROM GIT_table_that_holds_accounts l on d.add_FROM GIT_account = l.FROM GIT_account
+					LEFT JOIN #theTable#_hcat ch on ch.frn_GIT_ID_for_call = c.GIT_ID_for_call
+					FROM GIT_table_that_holds_groups_of_rotating_numbers xdp on d.poolmaster = xdp.GIT_PhNumpoolid
+				WHERE 
+					c.GIT_the_date >= #createodbcdate(this_start)# 
+					AND c.GIT_the_date < #createodbcdate(this_end)# 
+					AND poolmaster = #siteID#
+					AND c.spamrating = 0
+				GROUP BY d.poolmaster, d.label4 )
+			SELECT
+				case when utm_source = '' then 'Other Various Sources' else utm_source end as 'utm_source',
+				sum(Total_calls) as 'total_calls',
+				sum(Sales_Opps) as 'Sales_Opps',
+				sum(Booked_Appt) as 'Booked_Appt'
+			FROM the_data	
+			GROUP BY case when utm_source = '' then 'Other Various Sources' else utm_source end
+			order by sum(Total_calls) desc
 		</cfquery>
 		
-		<cfquery name="pull_campaigns" datasource="#GIT_protected_system_variable#">
-			SELECT
-				isnull(a.campaign_name,'Unnamed Campaign') AS 'AdWords_Campaign',
-				isnull(count(distinct a.Ad_Group_Name),0) as 'Adword_groups',
-				COUNT(distinct c.GIT_ID_for_call) as Total_Calls,
-				COUNT(distinct case when GIT_frn_id_of_humanatic_call_review_question in (#sales_opp_hco#) then c.GIT_ID_for_call else null end) AS Sales_Opps,
-				COUNT(distinct case when GIT_frn_id_of_humanatic_call_review_question in (#booked_appt_hco#) then c.GIT_ID_for_call else null end) AS Booked_Appt,
-				dpd.FROM GIT_group_of_numbers_ID as 'GIT_PhNumpoolid'
-			FROM GIT_table_that_holds_accounts l
-				FROM GIT_table_holding_phone_numbers d ON d.add_FROM GIT_account = l.FROM GIT_account and add_FROM GIT_account = #session.GIT_variable_CM_lskin#
-				FROM GIT_table_holding_number_labels dld ON dld.frn_GIT_PhNumid = d.GIT_PhNumid AND dld.label_place = 0
-				FROM GIT_table_holding_number_labels dl4 ON dl4.frn_GIT_PhNumid = d.GIT_PhNumid AND dl4.label_place = 4  
-				FROM GIT_table_that_holds_call_data_long c ON c.cf_frn_GIT_PhNumid = d.GIT_PhNumid  
-				FROM GIT_table_that_holds_call_data_long_hcat ch on c.GIT_ID_for_call = ch.frn_GIT_ID_for_call
-				FROM GIT_table_holding_calls_from_adwords_long a ON a.frn_GIT_ID_for_call = c.GIT_ID_for_call         
-				FROM GIT_table_holding_web_sessions_action_call_long dpac ON dpac.frn_GIT_ID_for_call = c.GIT_ID_for_call
-				FROM GIT_table_holding_web_sessions_long dpd ON dpd.dpdid = dpac.frn_dpdid
-				FROM GIT_table_holding_web_sessions_variable_long var ON var.frn_dpdid = dpac.frn_dpdid 
-			WHERE c.GIT_the_date >= #createodbcdate(this_start)# 
-			   AND c.GIT_the_date < #createodbcdate(this_end)# 
-					and dpd.FROM GIT_group_of_numbers_ID is not null
-					and dpd.FROM GIT_group_of_numbers_ID = #siteID#
-					and a.adwords_GIT_ID_for_call is not null
-				GROUP BY a.campaign_name, dpd.FROM GIT_group_of_numbers_ID	
-		</cfquery>
+		<cfif is_pro.recordcount> 
+			<cfquery name="pull_campaigns" datasource="#GIT_protected_system_variable#">
+				select
+					isnull(a.campaign_name,'Unnamed Campaign') AS 'AdWords_Campaign',
+					isnull(count(distinct a.Ad_Group_Name),0) as 'Adword_groups',
+					d.poolmaster as 'GIT_PhNumpoolid', 
+					count(distinct c.GIT_ID_for_call) as 'Total_Calls',
+					sum(case when GIT_frn_id_of_humanatic_call_review_question in (#sales_opp_hco#) then 1 else 0 end) AS 'Sales_Opps',
+					sum(case when GIT_frn_id_of_humanatic_call_review_question in (#booked_appt_hco#) then 1 else 0 end) AS 'Booked_Appt'
+				FROM #theTable# c
+					FROM GIT_table_that_holds_numbers d ON c.cf_frn_GIT_PhNumid = d.GIT_PhNumid and add_FROM GIT_account = 20433
+					FROM GIT_table_that_holds_accounts l on d.add_FROM GIT_account = l.FROM GIT_account
+					FROM GIT_table_holding_calls_from_adwords_#dpdtable.category# a ON a.frn_GIT_ID_for_call = c.GIT_ID_for_call         
+					LEFT JOIN #theTable#_hcat ch on ch.frn_GIT_ID_for_call = c.GIT_ID_for_call
+					FROM GIT_table_that_holds_groups_of_rotating_numbers xdp on d.poolmaster = xdp.GIT_PhNumpoolid
+				WHERE 
+					c.GIT_the_date >= #createodbcdate(this_start)# 
+					AND c.GIT_the_date < #createodbcdate(this_end)# 
+					AND poolmaster = #siteID#
+					AND c.spamrating = 0
+				GROUP BY isnull(a.campaign_name,'Unnamed Campaign'),d.poolmaster
+				ORDER BY count(distinct c.GIT_ID_for_call) desc
+			</cfquery>
+			
+			<cfquery name="pull_adgroups" datasource="#GIT_protected_system_variable#">
+				SELECT
+					ISNULL(a.Ad_Group_Name,'Unnamed Group') as 'Adword_groups',
+					COUNT(distinct c.GIT_ID_for_call) as Total_Calls,
+					sum(case when GIT_frn_id_of_humanatic_call_review_question in (#sales_opp_hco#) then 1 else 0 end) AS 'Sales_Opps',
+					sum(case when GIT_frn_id_of_humanatic_call_review_question in (#booked_appt_hco#) then 1 else 0 end) AS 'Booked_Appt'
+				FROM #theTable# c
+					FROM GIT_table_that_holds_numbers d ON c.cf_frn_GIT_PhNumid = d.GIT_PhNumid and add_FROM GIT_account = 20433
+					FROM GIT_table_that_holds_accounts l on d.add_FROM GIT_account = l.FROM GIT_account
+					FROM GIT_table_holding_calls_from_adwords_#dpdtable.category# a ON a.frn_GIT_ID_for_call = c.GIT_ID_for_call         
+					LEFT JOIN #theTable#_hcat ch on ch.frn_GIT_ID_for_call = c.GIT_ID_for_call
+					FROM GIT_table_that_holds_groups_of_rotating_numbers xdp on d.poolmaster = xdp.GIT_PhNumpoolid
+				WHERE 
+					c.GIT_the_date >= #createodbcdate(this_start)# 
+					AND c.GIT_the_date < #createodbcdate(this_end)# 
+					AND poolmaster = #siteID#
+					AND c.spamrating = 0
+				GROUP BY a.Ad_Group_Name
+				ORDER BY count(distinct c.GIT_ID_for_call) desc
+			</cfquery>
+		</cfif>
 	</cfoutput>
 
 	<cfquery dbtype="query" name="pull_sources_total">  
 		SELECT sum(Total_Calls) as Total
 		FROM pull_sources 
 	</cfquery> 
-	
-
 	
 	<cfif isdefined('spoof_bottom')>
 		<cfoutput>
@@ -178,5 +215,4 @@
 	<cfcatch>
 		<cfdump var='#cfcatch#'>
 	</cfcatch>
-
 </cftry>
