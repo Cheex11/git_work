@@ -338,17 +338,41 @@
 				</div>
 			</li>
 				<cfoutput query='pull_campaigns'>
+
+						<!-- Connected Calls -->
+							<cfset outURLConnected="../cx/clickthrough.cfm?">
+							<cfset outURLConnected=outURLConnected&'this_start='&#URLEncodedFormat(this_start)#>
+							<cfset outURLConnected=outURLConnected&'&this_end='&#URLEncodedFormat(this_end)#>
+							<cfset outURLConnected=outURLConnected&'&WSC_dpid='&#URLEncodedFormat(siteID)#>
+							<cfset outURLConnected=outURLConnected&'&WSC_campaign='&#URLEncodedFormat(AdWords_Campaign)#>
+						<!-- Sales Opps -->
+							<cfset outURLSales="../cx/clickthrough.cfm?">
+							<cfset outURLSales=outURLSales&'this_start='&#URLEncodedFormat(this_start)#>
+							<cfset outURLSales=outURLSales&'&this_end='&#URLEncodedFormat(this_end)#>
+							<cfset outURLSales=outURLSales&'&WSC_dpid='&#URLEncodedFormat(siteID)#>
+							<cfset outURLSales=outURLSales&'&WSC_hco='&#URLEncodedFormat(sales_opp_hco)#>
+							<cfset outURLSales=outURLSales&'&WSC_campaign='&#URLEncodedFormat(AdWords_Campaign)#>
+
+						<!-- Appt Requests -->
+							<cfset outURLBooked="../cx/clickthrough.cfm?">
+							<cfset outURLBooked=outURLBooked&'this_start='&#URLEncodedFormat(this_start)#>
+							<cfset outURLBooked=outURLBooked&'&this_end='&#URLEncodedFormat(this_end)#>
+							<cfset outURLBooked=outURLBooked&'&WSC_dpid='&#URLEncodedFormat(siteID)#>
+							<cfset outURLBooked=outURLBooked&'&WSC_hco='&#URLEncodedFormat(booked_appt_hco)#>
+							<cfset outURLBooked=outURLBooked&'&WSC_campaign='&#URLEncodedFormat(AdWords_Campaign)#>
+				
+				
 					<li class="staff2-list-row">
 						<div class="list-block column-5 data-cell">
 							<i class="fa fa-chevron-right"></i>&nbsp;
 						</div><div class="list-block column-1">
 							<p class="lename">#AdWords_Campaign#</p>
 						</div><div class="list-block column-2 data-cell">
-							<a href="">#Total_Calls#</a>
+							<a href="../thinking.cfm?redirect=#URLEncodedFormat(outURLConnected)#">#Total_Calls#</a>
 						</div><div class="list-block column-3 data-cell">
-							<a href="">#Sales_Opps#</a>
+							<a href="../thinking.cfm?redirect=#URLEncodedFormat(Sales_Opps)#">#Sales_Opps#</a>
 						</div><div class="list-block column-4 data-cell">
-							<a href="">#Booked_Appt#</a>
+							<a href="../thinking.cfm?redirect=#URLEncodedFormat(Booked_Appt)#">#Booked_Appt#</a>
 						</div>
 						<cfif Adword_groups NEQ '' AND Adword_groups GT 1>
 							<cfquery name='pull_groups' datasource='#application.ds#'>
@@ -357,62 +381,37 @@
 									COUNT(distinct c.GIT_ID_for_call) as Total_Calls,
 									COUNT(distinct case when GIT_frn_id_of_humanatic_call_review_question in (#sales_opp_hco#) then c.GIT_ID_for_call else null end) AS Sales_Opps,
 									COUNT(distinct case when GIT_frn_id_of_humanatic_call_review_question in (#booked_appt_hco#) then c.GIT_ID_for_call else null end) AS Booked_Appt
-								FROM GIT_table_that_holds_accounts l
-									FROM GIT_table_holding_phone_numbers d ON d.add_FROM GIT_account = l.FROM GIT_account and add_FROM GIT_account = #session.GIT_variable_CM_lskin#
-									FROM GIT_table_holding_number_labels dld ON dld.frn_GIT_PhNumid = d.GIT_PhNumid AND dld.label_place = 0
-									FROM GIT_table_holding_number_labels dl4 ON dl4.frn_GIT_PhNumid = d.GIT_PhNumid AND dl4.label_place = 4
-									FROM GIT_table_that_holds_call_data_long c ON c.cf_frn_GIT_PhNumid = d.GIT_PhNumid
-									FROM GIT_table_that_holds_call_data_long_hcat ch on c.GIT_ID_for_call = ch.frn_GIT_ID_for_call
-									FROM GIT_table_holding_calls_from_adwords a ON a.frn_GIT_ID_for_call = c.GIT_ID_for_call
-									FROM GIT_table_holding_web_sessions_action_call_long dpac ON dpac.frn_GIT_ID_for_call = c.GIT_ID_for_call
-									FROM GIT_table_holding_web_sessions_long dpd ON dpd.dpdid = dpac.frn_dpdid
-									FROM GIT_table_holding_web_sessions_variable_long var ON var.frn_dpdid = dpac.frn_dpdid AND var.frn_web_variableid IN (2,3,4,6,7)
-								WHERE c.GIT_the_date >= #createodbcdate(this_start) #
-								   AND c.GIT_the_date < #createodbcdate(this_end) #
+								FROM #theTable# c
+									FROM GIT_table_that_holds_numbers d ON c.cf_frn_GIT_PhNumid = d.GIT_PhNumid and add_FROM GIT_account = 20433
+									FROM GIT_table_that_holds_accounts l on d.add_FROM GIT_account = l.FROM GIT_account
+									FROM GIT_table_holding_calls_from_adwords_#dpdtable.category# a ON a.frn_GIT_ID_for_call = c.GIT_ID_for_call
+									LEFT JOIN #theTable#_hcat ch on ch.frn_GIT_ID_for_call = c.GIT_ID_for_call
+									FROM GIT_table_that_holds_groups_of_rotating_numbers xdp on d.poolmaster = xdp.GIT_PhNumpoolid
+								WHERE
+									c.GIT_the_date >= #createodbcdate(this_start)#
+									AND c.GIT_the_date < #createodbcdate(this_end)#
+									AND poolmaster = #siteID#
 								   AND a.campaign_name = '#AdWords_Campaign#'
-								   <cfif isdefined('siteID')>
-										and dpd.FROM GIT_group_of_numbers_ID = #siteID#
-								   </cfif>
+									AND c.spamrating = 0
 								GROUP BY a.Ad_Group_Name
+								ORDER BY count(distinct c.GIT_ID_for_call) desc
 							</cfquery>
-
-							<cfif isdefined('spoof_bottom')>
-								<cfset pull_groups = QueryNew("Adword_groups,
-																	Total_Calls,
-																	Sales_Opps,
-																	Booked_Appt")>
-
-								<!--- populating spreadsheet data --->
-								<cfset newrow = QueryAddRow(pull_groups,3)>
-								<cfset temp = QuerySetCell(pull_groups, "Adword_groups","Group One",1)>
-								<cfset temp = QuerySetCell(pull_groups, "Total_Calls",100,1)>
-								<cfset temp = QuerySetCell(pull_groups, "Sales_Opps",100,1)>
-								<cfset temp = QuerySetCell(pull_groups, "Booked_Appt",30,1)>
-
-								<cfset temp = QuerySetCell(pull_groups, "Adword_groups","Group Two",2)>
-								<cfset temp = QuerySetCell(pull_groups, "Total_Calls",80,2)>
-								<cfset temp = QuerySetCell(pull_groups, "Sales_Opps",60,2)>
-								<cfset temp = QuerySetCell(pull_groups, "Booked_Appt",3,2)>
-
-								<cfset temp = QuerySetCell(pull_groups, "Adword_groups","Group Three",3)>
-								<cfset temp = QuerySetCell(pull_groups, "Total_Calls",20,3)>
-								<cfset temp = QuerySetCell(pull_groups, "Sales_Opps",5,3)>
-								<cfset temp = QuerySetCell(pull_groups, "Booked_Appt",2,3)>
-							</cfif>
 
 
 							<cfloop query='pull_groups'>
+								<cfset outURLBooked=outURLBooked&'&WSC_campaign_and_Adword='&#URLEncodedFormat(Adword_groups)#>
+
 								<div class="adsource-row">
 									<div class="adsource-container">
 										<!--- <div class="list-block column-5 data-cell">
 										</div> ---><div class="list-block column-1">
 											<p class="lename2">#Adword_groups#</p>
 										</div><div class="list-block column-2 data-cell">
-											<a href="">#Total_Calls#</a>
+											<a href="../thinking.cfm?redirect=#URLEncodedFormat(outURLConnected)#">#Total_Calls#</a>
 										</div><div class="list-block column-3 data-cell">
-											<a href="">#Sales_Opps#</a>
+											<a href="../thinking.cfm?redirect=#URLEncodedFormat(Sales_Opps)#">#Sales_Opps#</a>
 										</div><div class="list-block column-4 data-cell">
-											<a href="">#Booked_Appt#</a>
+											<a href="../thinking.cfm?redirect=#URLEncodedFormat(Booked_Appt)#">#Booked_Appt#</a>
 										</div>
 									</div>
 								</div>
