@@ -1,5 +1,4 @@
 <!--- The siteID var is the GIT_PhNumpoolid selected from the dropdown. --->
-
 <cftry>
 	<cfif NOT isDefined('this_start')>
 		<cfif isDefined('SESSION.GIT_variable_CM_start')>
@@ -25,6 +24,12 @@
 			</script>
 			--->
 		</cfif>
+	</cfif>
+	
+	<cfset archive = "" />
+
+	<cfif DateDiff("d", this_start, now() ) gt 45>
+		<cfset archive = "archive.dbo." />
 	</cfif>
 	
 	<cfinclude template="../query_table_call.cfm">
@@ -109,7 +114,7 @@
 					sum(case when GIT_frn_id_of_humanatic_call_review_question in (#sales_opp_hco#) then 1 else 0 end) AS 'Sales_Opps',
 					sum(case when GIT_frn_id_of_humanatic_call_review_question in (#booked_appt_hco#) then 1 else 0 end) AS 'Booked_Appt'
 				FROM #theTable# c
-					FROM GIT_table_that_holds_numbers d ON c.cf_frn_GIT_PhNumid = d.GIT_PhNumid and add_FROM GIT_account = 20433
+					FROM GIT_table_that_holds_numbers d ON c.cf_frn_GIT_PhNumid = d.GIT_PhNumid and add_FROM GIT_account = <cfqueryparam value="#session.GIT_variable_CM_lskin#" CFSQLType="CF_SQL_INTEGER">
 					FROM GIT_table_that_holds_accounts l on d.add_FROM GIT_account = l.FROM GIT_account
 					LEFT JOIN #theTable#_hcat ch on ch.frn_GIT_ID_for_call = c.GIT_ID_for_call
 					FROM GIT_table_that_holds_groups_of_rotating_numbers xdp on d.poolmaster = xdp.GIT_PhNumpoolid
@@ -139,9 +144,9 @@
 					sum(case when GIT_frn_id_of_humanatic_call_review_question in (#sales_opp_hco#) then 1 else 0 end) AS 'Sales_Opps',
 					sum(case when GIT_frn_id_of_humanatic_call_review_question in (#booked_appt_hco#) then 1 else 0 end) AS 'Booked_Appt'
 				FROM #theTable# c
-					FROM GIT_table_that_holds_numbers d ON c.cf_frn_GIT_PhNumid = d.GIT_PhNumid and add_FROM GIT_account = 20433
+					FROM GIT_table_that_holds_numbers d ON c.cf_frn_GIT_PhNumid = d.GIT_PhNumid and add_FROM GIT_account = <cfqueryparam value="#session.GIT_variable_CM_lskin#" CFSQLType="CF_SQL_INTEGER">
 					FROM GIT_table_that_holds_accounts l on d.add_FROM GIT_account = l.FROM GIT_account
-					FROM GIT_table_holding_calls_from_adwords_#dpdtable.category# a ON a.frn_GIT_ID_for_call = c.GIT_ID_for_call         
+					INNER JOIN #archive#adwords_call_#dpdtable.category# a ON a.frn_GIT_ID_for_call = c.GIT_ID_for_call         
 					LEFT JOIN #theTable#_hcat ch on ch.frn_GIT_ID_for_call = c.GIT_ID_for_call
 					FROM GIT_table_that_holds_groups_of_rotating_numbers xdp on d.poolmaster = xdp.GIT_PhNumpoolid
 				WHERE 
@@ -152,7 +157,8 @@
 				GROUP BY isnull(a.campaign_name,'Unnamed Campaign'),d.poolmaster
 				ORDER BY count(distinct c.GIT_ID_for_call) desc
 			</cfquery>
-			
+		
+		
 			<cfquery name="pull_adgroups" datasource="#GIT_protected_system_variable#">
 				SELECT
 					ISNULL(a.Ad_Group_Name,'Unnamed Group') as 'Adword_groups',
@@ -160,9 +166,9 @@
 					sum(case when GIT_frn_id_of_humanatic_call_review_question in (#sales_opp_hco#) then 1 else 0 end) AS 'Sales_Opps',
 					sum(case when GIT_frn_id_of_humanatic_call_review_question in (#booked_appt_hco#) then 1 else 0 end) AS 'Booked_Appt'
 				FROM #theTable# c
-					FROM GIT_table_that_holds_numbers d ON c.cf_frn_GIT_PhNumid = d.GIT_PhNumid and add_FROM GIT_account = 20433
+					FROM GIT_table_that_holds_numbers d ON c.cf_frn_GIT_PhNumid = d.GIT_PhNumid and add_FROM GIT_account = <cfqueryparam value="#session.GIT_variable_CM_lskin#" CFSQLType="CF_SQL_INTEGER">
 					FROM GIT_table_that_holds_accounts l on d.add_FROM GIT_account = l.FROM GIT_account
-					FROM GIT_table_holding_calls_from_adwords_#dpdtable.category# a ON a.frn_GIT_ID_for_call = c.GIT_ID_for_call         
+					INNER JOIN #archive#adwords_call_#dpdtable.category# a ON a.frn_GIT_ID_for_call = c.GIT_ID_for_call         
 					LEFT JOIN #theTable#_hcat ch on ch.frn_GIT_ID_for_call = c.GIT_ID_for_call
 					FROM GIT_table_that_holds_groups_of_rotating_numbers xdp on d.poolmaster = xdp.GIT_PhNumpoolid
 				WHERE 
