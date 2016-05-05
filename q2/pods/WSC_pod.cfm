@@ -1171,27 +1171,28 @@ select {
 					</div>
 				</li>
 				<cfoutput query='pull_sources'>
-						<!-- Connected Calls -->
-							<cfset outURLConnected="../cx/clickthrough.cfm?">
-							<cfset outURLConnected=outURLConnected&'this_start='&#URLEncodedFormat(this_start)#>
-							<cfset outURLConnected=outURLConnected&'&this_end='&#URLEncodedFormat(this_end)#>
-							<cfset outURLConnected=outURLConnected&'&WSC_source='&#URLEncodedFormat(siteID)#>
-							<cfset outURLConnected=outURLConnected&'&UTM_Source='&#URLEncodedFormat(utm_source)#>
-						<!-- Sales Opps -->
-							<cfset outURLSales="../cx/clickthrough.cfm?">
-							<cfset outURLSales=outURLSales&'this_start='&#URLEncodedFormat(this_start)#>
-							<cfset outURLSales=outURLSales&'&this_end='&#URLEncodedFormat(this_end)#>
-							<cfset outURLSales=outURLSales&'&WSC_source='&#URLEncodedFormat(siteID)#>
-							<cfset outURLSales=outURLSales&'&UTM_Source='&#URLEncodedFormat(utm_source)#>
-							<cfset outURLSales=outURLSales&'&WSC_hco='&#URLEncodedFormat(sales_opp_hco)#>
+					<!-- Connected Calls -->
+						<cfset outURLConnected="../cx/clickthrough.cfm?">
+						<cfset outURLConnected=outURLConnected&'this_start='&#URLEncodedFormat(this_start)#>
+						<cfset outURLConnected=outURLConnected&'&this_end='&#URLEncodedFormat(this_end)#>
+						<cfset outURLConnected=outURLConnected&'&WSC_source='&#URLEncodedFormat(siteID)#>
+						<cfset outURLConnected=outURLConnected&'&UTM_Source='&#URLEncodedFormat(utm_source)#>
+					<!-- Sales Opps -->
+						<cfset outURLSales="../cx/clickthrough.cfm?">
+						<cfset outURLSales=outURLSales&'this_start='&#URLEncodedFormat(this_start)#>
+						<cfset outURLSales=outURLSales&'&this_end='&#URLEncodedFormat(this_end)#>
+						<cfset outURLSales=outURLSales&'&WSC_source='&#URLEncodedFormat(siteID)#>
+						<cfset outURLSales=outURLSales&'&UTM_Source='&#URLEncodedFormat(utm_source)#>
+						<cfset outURLSales=outURLSales&'&WSC_hco='&#URLEncodedFormat(sales_opp_hco)#>
 
-						<!-- Appt Requests -->
-							<cfset outURLBooked="../cx/clickthrough.cfm?">
-							<cfset outURLBooked=outURLBooked&'this_start='&#URLEncodedFormat(this_start)#>
-							<cfset outURLBooked=outURLBooked&'&this_end='&#URLEncodedFormat(this_end)#>
-							<cfset outURLBooked=outURLBooked&'&WSC_source='&#URLEncodedFormat(siteID)#>
-							<cfset outURLBooked=outURLBooked&'&UTM_Source='&#URLEncodedFormat(utm_source)#>
-							<cfset outURLBooked=outURLBooked&'&WSC_hco='&#URLEncodedFormat(booked_appt_hco)#>
+					<!-- Appt Requests -->
+						<cfset outURLBooked="../cx/clickthrough.cfm?">
+						<cfset outURLBooked=outURLBooked&'this_start='&#URLEncodedFormat(this_start)#>
+						<cfset outURLBooked=outURLBooked&'&this_end='&#URLEncodedFormat(this_end)#>
+						<cfset outURLBooked=outURLBooked&'&WSC_source='&#URLEncodedFormat(siteID)#>
+						<cfset outURLBooked=outURLBooked&'&UTM_Source='&#URLEncodedFormat(utm_source)#>
+						<cfset outURLBooked=outURLBooked&'&WSC_hco='&#URLEncodedFormat(booked_appt_hco)#>
+						
 					<li class="staff-list-row">
 						<div class="list-block column-1">
 							<p class="lename">#utm_source#</p>
@@ -1304,7 +1305,7 @@ select {
 						</div><div class="list-block column-4 data-cell">
 							<a href="../platform_a/thinking.cfm?redirect=#URLEncodedFormat(Booked_Appt)#">#Booked_Appt#</a>
 						</div>
-						<cfif Adword_groups NEQ '' AND Adword_groups GT 1>
+						<cfif Adword_groups NEQ '' AND Adword_groups GT 0>
 							<cfquery name='pull_groups' datasource='#application.ds#'>
 								SELECT
 									ISNULL(a.Ad_Group_Name,'Unnamed Group') as 'Adword_groups',
@@ -1314,7 +1315,7 @@ select {
 								FROM #theTable# c
 									FROM GIT_table_that_holds_numbers d ON c.cf_frn_GIT_PhNumid = d.GIT_PhNumid and add_FROM GIT_account = 20433
 									FROM GIT_table_that_holds_accounts l on d.add_FROM GIT_account = l.FROM GIT_account
-									FROM GIT_table_holding_calls_from_adwords_#dpdtable.category# a ON a.frn_GIT_ID_for_call = c.GIT_ID_for_call
+									INNER JOIN #archive#adwords_call_#dpdtable.category# a ON a.frn_GIT_ID_for_call = c.GIT_ID_for_call
 									LEFT JOIN #theTable#_hcat ch on ch.frn_GIT_ID_for_call = c.GIT_ID_for_call
 									FROM GIT_table_that_holds_groups_of_rotating_numbers xdp on d.poolmaster = xdp.GIT_PhNumpoolid
 								WHERE
@@ -2489,7 +2490,8 @@ $(document).ready(function(){
 $('.website-select-btn').click(function(){
 	var siteID = $('select[name=siteID]').val();
 	if(siteID != '_PLACEHOLDER'){
-		window.location.href="../platform_allies/report_viewer.cfm?pid=269&siteID="+siteID;
+		window.location.href="../platform_allies/report_viewer.cfm?pid=269&siteID="+siteID+"&";
+		//window.location.href="../platform_allies/report_viewer.cfm?pid=269&siteID="+siteID+"&this_start="+this_start+"&this_end="+this_end;
 	}
 	else{
 		window.location.href="../platform_allies/report_viewer.cfm?pid=269";
