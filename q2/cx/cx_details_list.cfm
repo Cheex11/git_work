@@ -3,11 +3,14 @@
 11/4/15 Removed 6 100 references Proj4425 http://core.callbox.com/go/hproject_manage.cfm?pid=4425 NE
 
 ---->
+<cftry>
 
 <cfif Not IsDefined('SESSION.GIT_variable_CMGIT_verticalID')>
 	<cflocation url="//#CGI.SERVER_NAME#" addtoken="false">
 	<cfabort />
 </cfif>
+
+	
 
 <cfif SESSION.GIT_variable_CMGIT_verticalID NEQ 1
 		AND SESSION.GIT_variable_CMGIT_verticalID NEQ 2
@@ -144,7 +147,6 @@
 	<cfset this_lskin_all = SESSION.axreport_lskin />
 </cfif>
 
-
 <cfset THIS_START = SESSION.cx_date_start>
 <cfset THIS_END = SESSION.cx_date_end>
 <cfinclude template="../platform_a/query_table_call.cfm">
@@ -186,6 +188,77 @@
 	<cfset hcat_extensions = ArrayToList(ListToArray(ValueList(pull_GIT_PhNum_hcat.frn_extension_GIT_PhNumid)))>
 </cfif>
 
+<cfif isdefined('WSC_source')>
+	<cfquery name='pull_wsc_calls_with_source' datasource='#application.ds#'>
+		select
+			GIT_ID_for_call
+		FROM #theTable# c
+			FROM GIT_table_that_holds_numbers d ON c.cf_frn_GIT_PhNumid = d.GIT_PhNumid and add_FROM GIT_account = #session.GIT_variable_CM_lskin#
+			FROM GIT_table_that_holds_accounts l on d.add_FROM GIT_account = l.FROM GIT_account
+			LEFT JOIN #theTable#_hcat ch on ch.frn_GIT_ID_for_call = c.GIT_ID_for_call
+			FROM GIT_table_that_holds_groups_of_rotating_numbers xdp on d.poolmaster = xdp.GIT_PhNumpoolid
+		WHERE 
+				c.GIT_the_date >= #createodbcdate(SESSION.cx_date_start)# 
+		   AND 	c.GIT_the_date < #createodbcdate(SESSION.cx_date_end)# 
+		   AND 	poolmaster = #WSC_source#
+		   AND  c.spamrating = 0
+		<cfif isdefined('wsc_hco')>
+			and GIT_frn_id_of_humanatic_call_review_question in (#wsc_hco#)
+		</cfif>		
+		<cfif isdefined("UTM_source") and UTM_source NEQ "Other Various Sources">
+			and d.label4 = '#UTM_source#'
+		<cfelse>
+			and (d.label4 = '' or d.label4 is null)
+		</cfif>
+	</cfquery>
+</cfif>
+
+<cfif isdefined('WSC_campaign')>
+	<cfquery name="pull_wsc_calls_with_campaign" datasource="#GIT_protected_system_variable#">
+		SELECT
+			GIT_ID_for_call
+		FROM #theTable# c
+			FROM GIT_table_that_holds_numbers d ON c.cf_frn_GIT_PhNumid = d.GIT_PhNumid and add_FROM GIT_account = <cfqueryparam value="#session.GIT_variable_CM_lskin#" CFSQLType="CF_SQL_INTEGER">
+			<cfif isdefined('siteID')>
+			FROM GIT_table_that_holds_accounts l on d.add_FROM GIT_account = l.FROM GIT_account
+			FROM GIT_table_holding_calls_from_adwords_#dpdtable.category# a ON a.frn_GIT_ID_for_call = c.GIT_ID_for_call         
+			LEFT JOIN #theTable#_hcat ch on ch.frn_GIT_ID_for_call = c.GIT_ID_for_call
+			FROM GIT_table_that_holds_groups_of_rotating_numbers xdp on d.poolmaster = xdp.GIT_PhNumpoolid
+		WHERE c.GIT_the_date >= #createodbcdate(SESSION.cx_date_start)# 
+			AND c.GIT_the_date < #createodbcdate(SESSION.cx_date_end)# 
+			AND poolmaster = #WSC_dpid#
+			AND c.spamrating = 0
+			AND a.campaign_name = '#WSC_campaign#'
+			<cfif isdefined('wsc_hco')>
+				and GIT_frn_id_of_humanatic_call_review_question in (#wsc_hco#)
+			</cfif>		
+			<cfif isdefined('WSC_Campaign_and_Adword')>
+				and a.Ad_Group_Name = '#WSC_Campaign_and_Adword#'
+			</cfif>
+	</cfquery>
+</cfif>
+
+<cfif isdefined('WSC_adgroup')>
+	<cfquery name="pull_wsc_calls_with_adgroup" datasource="#GIT_protected_system_variable#">
+		SELECT
+			GIT_ID_for_call
+		FROM #theTable# c
+			FROM GIT_table_that_holds_numbers d ON c.cf_frn_GIT_PhNumid = d.GIT_PhNumid and add_FROM GIT_account = <cfqueryparam value="#session.GIT_variable_CM_lskin#" CFSQLType="CF_SQL_INTEGER">
+			<cfif isdefined('siteID')>
+			FROM GIT_table_that_holds_accounts l on d.add_FROM GIT_account = l.FROM GIT_account
+			FROM GIT_table_holding_calls_from_adwords_#dpdtable.category# a ON a.frn_GIT_ID_for_call = c.GIT_ID_for_call         
+			LEFT JOIN #theTable#_hcat ch on ch.frn_GIT_ID_for_call = c.GIT_ID_for_call
+			FROM GIT_table_that_holds_groups_of_rotating_numbers xdp on d.poolmaster = xdp.GIT_PhNumpoolid
+		WHERE c.GIT_the_date >= #createodbcdate(SESSION.cx_date_start)# 
+			AND c.GIT_the_date < #createodbcdate(SESSION.cx_date_end)# 
+			AND poolmaster = #WSC_dpid#
+			AND c.spamrating = 0
+			<cfif isdefined('wsc_hco')>
+				and GIT_frn_id_of_humanatic_call_review_question in (#wsc_hco#)
+			</cfif>		
+			and Ad_Group_Name = '#WSC_adgroup#'
+	</cfquery>
+</cfif>
 
 <cfif NOT IsDefined("sr")>
 <cfif session.GIT_variable_CMGIT_verticalID EQ 1 OR session.GIT_variable_CMGIT_verticalID EQ 10 OR session.GIT_variable_CMGIT_verticalID EQ 11 OR session.GIT_variable_CMGIT_verticalID EQ 12>
@@ -225,9 +298,6 @@ AND listContains(session.cx_hco,'91273')>
 			<cfelse>
 				and d.GIT_PhNumid in (<cfqueryParam value="#this_GIT_PhNum_list#" list="yes" CFSQLType = 'CF_SQL_INTEGER'>)--here
 			</cfif>
-		</cfif>
-		<cfif isdefined('WSC_source')>
-			and xc.GIT_ID_for_call in (#ValueList(pull_wsc_calls_with_source.GIT_ID_for_call)#)
 		</cfif>
 		<cfif session.cx_phonecode neq '' and Session.cx_phonecode neq 'GIT_Legacy_Filter_Code' and Session.cx_phonecode neq "NULL" and Session.cx_phonecode neq "1">
 			and xc.frn_phonecodeid in ( <cfqueryParam value="#session.cx_phonecode#" list="yes" CFSQLType = 'CF_SQL_INTEGER'> )
@@ -360,6 +430,29 @@ AND listContains(session.cx_hco,'91273')>
 		<cfelseif Session.cx_phonecode eq "NULL" or Session.cx_phonecode eq "1">
 			and (x.frn_phonecodeid is NULL or x.frn_phonecodeid = 0)
 		</cfif>
+		
+		<cfif isdefined('pull_wsc_calls_with_source')>
+			<cfif pull_wsc_calls_with_source.recordCount>
+				and x.GIT_ID_for_call in (#ValueList(pull_wsc_calls_with_source.GIT_ID_for_call)#)
+			<cfelse>
+				and x.GIT_ID_for_call in (0)
+			</cfif>
+		</cfif>
+		<cfif isdefined('pull_wsc_calls_with_campaign')>
+			<cfif pull_wsc_calls_with_campaign.recordCount>
+				and x.GIT_ID_for_call in (#ValueList(pull_wsc_calls_with_campaign.GIT_ID_for_call)#)
+			<cfelse>
+				and x.GIT_ID_for_call in (0)
+			</cfif>
+		</cfif>
+		<cfif isdefined('pull_wsc_calls_with_adgroup')>
+			<cfif pull_wsc_calls_with_adgroup.recordCount>
+				and x.GIT_ID_for_call in (#ValueList(pull_wsc_calls_with_adgroup.GIT_ID_for_call)#)
+			<cfelse>
+				and x.GIT_ID_for_call in (0)
+			</cfif>
+		</cfif>
+		
 		<cfif session.cx_ani neq ''>
 			 --AND ani.theani = '#session.cx_ani#'
 			 AND frn_calllog_aniid in (select calllog_aniid from calllog_ani where theani= <cfqueryParam value="#session.cx_ani#" CFSQLType = 'CF_SQL_VARCHAR'>)
@@ -432,6 +525,7 @@ AND listContains(session.cx_hco,'91273')>
 		</cfif>
 		order by x.GIT_the_datetime desc
 </cfquery>
+
 <cfif isdefined('timer')>
 <cfoutput>End #Now()#</cfoutput>
 <cfabort>
@@ -678,6 +772,10 @@ $(document).ready(function(){
 	<cfdump var = "#dpdtable.category#">
 </cfif>
 
+<cfcatch>
+	<cfdump var='#cfcatch#'>
+</cfcatch>
+</cftry>
 <!---<cfdump var="#pull_GIT_ID_for_calls#"/>--->
 <!---
 <cfif pull_GIT_ID_for_calls.recordCount GT 0>
