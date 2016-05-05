@@ -1,0 +1,1 @@
+This repisitory will hold projects I work on at work. Sensitive variables are replaced with "GIT_###". 
