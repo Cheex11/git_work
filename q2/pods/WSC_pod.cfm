@@ -139,6 +139,7 @@ select {
 	border-radius: 3px;
 	overflow: hidden;
 	z-index:1;
+	border: none;
 }
 .left-module {
 	margin-left: 0px !important;
@@ -470,7 +471,7 @@ select {
 	display: block;
 	position: relative;
 	margin-top: 10px;
-	text-align: center;
+	text-align: left;
 }
 .never-connected-chart-holder {
 	display: inline-block;
@@ -491,6 +492,7 @@ select {
 }
 .never-connected-key ul li {
 	padding: 6px 0px;
+	list-style: none;
 }
 .key-color-bar {
 	display: inline-block;
@@ -517,6 +519,7 @@ select {
 	padding-left: 6px;
 	font-size: 16px;
 	line-height: 14px;
+	margin: 0px;
 }
 .key-text p span {
 	font-weight: 700;
@@ -550,8 +553,8 @@ select {
 	text-align: right;
 	padding: 12px 0px;
 }
-.column-1 {
-	width: 28%;
+.section-2 .column-1 {
+	width: 28% !important;
 	text-align: left !important;
 }
 .staff2-list-row .column-1 {
@@ -571,14 +574,14 @@ select {
 }
 .column-4 {
 	width:23%;
-	padding-right:1%;
+	padding-right:0%;
 }
 .staff-list-row .column-4 a {
 	padding-right:8px;
 }
 .staff-list-labels-row .column-4, .staff2-list-labels-row .column-4, .staff3-list-labels-row .column-4 {
 	width:22%;
-	padding-right:2%;
+	padding-right:0%;
 }
 .list-label {
 	display: inline-block;
@@ -1001,15 +1004,17 @@ select {
 	margin-top:24px;
 }
 .campaign-ad-btn {
-	display:inline-block;
+	display:inline-block !important;
 	vertical-align:middle;
 	color:#919191;
 	border-radius:3px;
 	margin-right:32px;
 	cursor:pointer;
+	visibility: visible !important;
 }
 .campaign-ad-btn span {
 	display:block;
+	visibility: visible !important;
 }
 .campaign-ad-btn:hover {
 	color:#747474;
@@ -1033,6 +1038,7 @@ select {
 	display:inline-block;
 	vertical-align:middle;
 	margin-right:12px;
+	visibility: visible !important;
 }
 .campaign-ad-btn span {
 	display:inline-block;
@@ -1077,10 +1083,10 @@ select {
 <ul class="section-1">
 	<div class="section-header-top-holder">
 		<h2 class="section-header-top top-section">Top Referring Sources</h2><div class="download">
-			<cfoutput><a href="report_viewer.cfm?pid=260">Download spreadsheet with UTM data</a></cfoutput>
+			<cfoutput><a href="report_viewer.cfm?pid=260&dpid=#siteID#">Download spreadsheet with UTM data</a></cfoutput>
 	</div>
 	</div>
-	<div class="module left-module">
+	<div class="module ">
 		<div class="never-connected-section">
 			<div class="never-connected-data">
 				<div class="never-connected-chart-holder">
@@ -1090,25 +1096,13 @@ select {
 							#ToScript(ValueList(pull_sources.Total_Calls), "Source_Percentage")#
 							#ToScript(pull_sources_total.total,"total_calls")#
 						</cfoutput>
-						
-						var Source_Percentage = Source_Percentage.split(",");
-						
 
-						<cfif isdefined('spoof_data')>
-							<!---var Source_Percentage = [eval(total_calls/5),
-														eval(total_calls/8),
-														eval(total_calls/20),
-														eval(total_calls/4),
-														eval(total_calls/8)]--->
-							var total_calls = 35
-							var Source_Percentage = [10,8,7,6,4]
-						</cfif>
+						var Source_Percentage = Source_Percentage.split(",");
 
 						var color_array = ["#f7464a","#2486e2","#0acc2f","#ef6500","#ededed"];
 						var data = []
 
 						for (i = 0; i < Source_Percentage.length; i++) {
-							console.log(i + " : " + Source_Percentage[i] + " : " + eval((Source_Percentage[i]/total_calls) * 100));
 							data.push(
 										{
 											value: parseInt(eval((Source_Percentage[i]/total_calls) * 100),10),
@@ -1177,32 +1171,32 @@ select {
 					</div>
 				</li>
 				<cfoutput query='pull_sources'>
-						
-						
 						<!-- Connected Calls -->
 							<cfset outURLConnected="../cx/clickthrough.cfm?">
-							<cfset outURLConnected=outURLConnected&'this_start='&#this_start#>
-							<cfset outURLConnected=outURLConnected&'&this_end='&#this_end#>
-							<cfif isdefined('siteID')>
-								<cfset outURLConnected=outURLConnected&'&GIT_PhNumpool='&#GIT_PhNumpoolid#>
-							</cfif>
+							<cfset outURLConnected=outURLConnected&'this_start='&#URLEncodedFormat(this_start)#>
+							<cfset outURLConnected=outURLConnected&'&this_end='&#URLEncodedFormat(this_end)#>
+							<cfset outURLConnected=outURLConnected&'&WSC_source='&#URLEncodedFormat(siteID)#>
+							<cfset outURLConnected=outURLConnected&'&UTM_Source='&#URLEncodedFormat(utm_source)#>
 						<!-- Sales Opps -->
-							<cfset outURLSales='60'>
 							<cfset outURLSales="../cx/clickthrough.cfm?">
 							<cfset outURLSales=outURLSales&'this_start='&#URLEncodedFormat(this_start)#>
 							<cfset outURLSales=outURLSales&'&this_end='&#URLEncodedFormat(this_end)#>
-							<cfset outURLSales=outURLSales&'&hco='&#URLEncodedFormat(sales_opp_hco)#>
+							<cfset outURLSales=outURLSales&'&WSC_source='&#URLEncodedFormat(siteID)#>
+							<cfset outURLSales=outURLSales&'&UTM_Source='&#URLEncodedFormat(utm_source)#>
+							<cfset outURLSales=outURLSales&'&WSC_hco='&#URLEncodedFormat(sales_opp_hco)#>
 
 						<!-- Appt Requests -->
 							<cfset outURLBooked="../cx/clickthrough.cfm?">
 							<cfset outURLBooked=outURLBooked&'this_start='&#URLEncodedFormat(this_start)#>
 							<cfset outURLBooked=outURLBooked&'&this_end='&#URLEncodedFormat(this_end)#>
-							<cfset outURLBooked=outURLBooked&'&hco='&#URLEncodedFormat(booked_appt_hco)#>
+							<cfset outURLBooked=outURLBooked&'&WSC_source='&#URLEncodedFormat(siteID)#>
+							<cfset outURLBooked=outURLBooked&'&UTM_Source='&#URLEncodedFormat(utm_source)#>
+							<cfset outURLBooked=outURLBooked&'&WSC_hco='&#URLEncodedFormat(booked_appt_hco)#>
 					<li class="staff-list-row">
 						<div class="list-block column-1">
 							<p class="lename">#utm_source#</p>
 						</div><div class="list-block column-2 data-cell">
-							<a href="../platform_a/thinking.cfm?redirect=#outURLConnected#">#Total_Calls#</a>
+							<a href="../platform_a/thinking.cfm?redirect=#URLEncodedFormat(outURLConnected)#">#Total_Calls#</a>
 						</div><div class="list-block column-3 data-cell">
 							<a href="../platform_a/thinking.cfm?redirect=#URLEncodedFormat(outURLSales)#">#Sales_Opps#</a>
 						</div><div class="list-block column-4 data-cell">
@@ -1238,12 +1232,12 @@ select {
 
 		<div class="campaign-ad-button-holder">
 			<div class="campaign-ad-btn campaign-btn active">
-				<div class = "btn-square">
+				<div class="btn-square">
 
 				</div><span>Campaigns</span>
 			</div>
 			<div class="campaign-ad-btn ad-btn">
-				<div class = "btn-square">
+				<div class="btn-square">
 
 				</div><span>Ad Groups</span>
 			</div>
@@ -1275,17 +1269,40 @@ select {
 				</li>
 
 				<cfoutput query='pull_campaigns'>
+
+						<!-- Connected Calls -->
+							<cfset outURLConnected="../cx/clickthrough.cfm?">
+							<cfset outURLConnected=outURLConnected&'this_start='&#URLEncodedFormat(this_start)#>
+							<cfset outURLConnected=outURLConnected&'&this_end='&#URLEncodedFormat(this_end)#>
+							<cfset outURLConnected=outURLConnected&'&WSC_dpid='&#URLEncodedFormat(siteID)#>
+							<cfset outURLConnected=outURLConnected&'&WSC_campaign='&#URLEncodedFormat(AdWords_Campaign)#>
+						<!-- Sales Opps -->
+							<cfset outURLSales="../cx/clickthrough.cfm?">
+							<cfset outURLSales=outURLSales&'this_start='&#URLEncodedFormat(this_start)#>
+							<cfset outURLSales=outURLSales&'&this_end='&#URLEncodedFormat(this_end)#>
+							<cfset outURLSales=outURLSales&'&WSC_dpid='&#URLEncodedFormat(siteID)#>
+							<cfset outURLSales=outURLSales&'&WSC_hco='&#URLEncodedFormat(sales_opp_hco)#>
+							<cfset outURLSales=outURLSales&'&WSC_campaign='&#URLEncodedFormat(AdWords_Campaign)#>
+
+						<!-- Appt Requests -->
+							<cfset outURLBooked="../cx/clickthrough.cfm?">
+							<cfset outURLBooked=outURLBooked&'this_start='&#URLEncodedFormat(this_start)#>
+							<cfset outURLBooked=outURLBooked&'&this_end='&#URLEncodedFormat(this_end)#>
+							<cfset outURLBooked=outURLBooked&'&WSC_dpid='&#URLEncodedFormat(siteID)#>
+							<cfset outURLBooked=outURLBooked&'&WSC_hco='&#URLEncodedFormat(booked_appt_hco)#>
+							<cfset outURLBooked=outURLBooked&'&WSC_campaign='&#URLEncodedFormat(AdWords_Campaign)#>
+
 					<li class="staff2-list-row">
 						<div class="list-block column-5 data-cell">
 							<i class="fa fa-chevron-right"></i>
 						</div><div class="list-block column-1">
 							<p class="lename">#AdWords_Campaign#</p>
 						</div><div class="list-block column-2 data-cell">
-							<a href="">#Total_Calls#</a>
+							<a href="../platform_a/thinking.cfm?redirect=#URLEncodedFormat(outURLConnected)#">#Total_Calls#</a>
 						</div><div class="list-block column-3 data-cell">
-							<a href="">#Sales_Opps#</a>
+							<a href="../platform_a/thinking.cfm?redirect=#URLEncodedFormat(Sales_Opps)#">#Sales_Opps#</a>
 						</div><div class="list-block column-4 data-cell">
-							<a href="">#Booked_Appt#</a>
+							<a href="../platform_a/thinking.cfm?redirect=#URLEncodedFormat(Booked_Appt)#">#Booked_Appt#</a>
 						</div>
 						<cfif Adword_groups NEQ '' AND Adword_groups GT 1>
 							<cfquery name='pull_groups' datasource='#application.ds#'>
@@ -1294,62 +1311,37 @@ select {
 									COUNT(distinct c.GIT_ID_for_call) as Total_Calls,
 									COUNT(distinct case when GIT_frn_id_of_humanatic_call_review_question in (#sales_opp_hco#) then c.GIT_ID_for_call else null end) AS Sales_Opps,
 									COUNT(distinct case when GIT_frn_id_of_humanatic_call_review_question in (#booked_appt_hco#) then c.GIT_ID_for_call else null end) AS Booked_Appt
-								FROM GIT_table_that_holds_accounts l
-									FROM GIT_table_holding_phone_numbers d ON d.add_FROM GIT_account = l.FROM GIT_account and add_FROM GIT_account = #session.GIT_variable_CM_lskin#
-									FROM GIT_table_holding_number_labels dld ON dld.frn_GIT_PhNumid = d.GIT_PhNumid AND dld.label_place = 0
-									FROM GIT_table_holding_number_labels dl4 ON dl4.frn_GIT_PhNumid = d.GIT_PhNumid AND dl4.label_place = 4
-									FROM GIT_table_that_holds_call_data_long c ON c.cf_frn_GIT_PhNumid = d.GIT_PhNumid
-									FROM GIT_table_that_holds_call_data_long_hcat ch on c.GIT_ID_for_call = ch.frn_GIT_ID_for_call
-									FROM GIT_table_holding_calls_from_adwords a ON a.frn_GIT_ID_for_call = c.GIT_ID_for_call
-									FROM GIT_table_holding_web_sessions_action_call_long dpac ON dpac.frn_GIT_ID_for_call = c.GIT_ID_for_call
-									FROM GIT_table_holding_web_sessions_long dpd ON dpd.dpdid = dpac.frn_dpdid
-									FROM GIT_table_holding_web_sessions_variable_long var ON var.frn_dpdid = dpac.frn_dpdid AND var.frn_web_variableid IN (2,3,4,6,7)
-								WHERE c.GIT_the_date >= #createodbcdate(this_start) #
-								   AND c.GIT_the_date < #createodbcdate(this_end) #
+								FROM #theTable# c
+									FROM GIT_table_that_holds_numbers d ON c.cf_frn_GIT_PhNumid = d.GIT_PhNumid and add_FROM GIT_account = 20433
+									FROM GIT_table_that_holds_accounts l on d.add_FROM GIT_account = l.FROM GIT_account
+									FROM GIT_table_holding_calls_from_adwords_#dpdtable.category# a ON a.frn_GIT_ID_for_call = c.GIT_ID_for_call
+									LEFT JOIN #theTable#_hcat ch on ch.frn_GIT_ID_for_call = c.GIT_ID_for_call
+									FROM GIT_table_that_holds_groups_of_rotating_numbers xdp on d.poolmaster = xdp.GIT_PhNumpoolid
+								WHERE
+									c.GIT_the_date >= #createodbcdate(this_start)#
+									AND c.GIT_the_date < #createodbcdate(this_end)#
+									AND poolmaster = #siteID#
 								   AND a.campaign_name = '#AdWords_Campaign#'
-								   <cfif isdefined('siteID')>
-										and dpd.FROM GIT_group_of_numbers_ID = #siteID#
-								   </cfif>
+									AND c.spamrating = 0
 								GROUP BY a.Ad_Group_Name
+								ORDER BY count(distinct c.GIT_ID_for_call) desc
 							</cfquery>
 
-							<cfif isdefined('spoof_bottom')>
-								<cfset pull_groups = QueryNew("Adword_groups,
-																	Total_Calls,
-																	Sales_Opps,
-																	Booked_Appt")>
-
-								<!--- populating spreadsheet data --->
-								<cfset newrow = QueryAddRow(pull_groups,3)>
-								<cfset temp = QuerySetCell(pull_groups, "Adword_groups","Group One",1)>
-								<cfset temp = QuerySetCell(pull_groups, "Total_Calls",100,1)>
-								<cfset temp = QuerySetCell(pull_groups, "Sales_Opps",100,1)>
-								<cfset temp = QuerySetCell(pull_groups, "Booked_Appt",30,1)>
-
-								<cfset temp = QuerySetCell(pull_groups, "Adword_groups","Group Two",2)>
-								<cfset temp = QuerySetCell(pull_groups, "Total_Calls",80,2)>
-								<cfset temp = QuerySetCell(pull_groups, "Sales_Opps",60,2)>
-								<cfset temp = QuerySetCell(pull_groups, "Booked_Appt",3,2)>
-
-								<cfset temp = QuerySetCell(pull_groups, "Adword_groups","Group Three",3)>
-								<cfset temp = QuerySetCell(pull_groups, "Total_Calls",20,3)>
-								<cfset temp = QuerySetCell(pull_groups, "Sales_Opps",5,3)>
-								<cfset temp = QuerySetCell(pull_groups, "Booked_Appt",2,3)>
-							</cfif>
-
-
 							<cfloop query='pull_groups'>
+
+							<cfset outURLBooked=outURLBooked&'&WSC_campaign_and_Adword='&#URLEncodedFormat(Adword_groups)#>
+
 								<div class="adsource-row">
 									<div class="adsource-container">
 										<div class="list-block column-5 data-cell">
 										</div><div class="list-block column-1">
 											<p class="lename2">#Adword_groups#</p>
 										</div><div class="list-block column-2 data-cell">
-											<a href="">#Total_Calls#</a>
+											<a href="../platform_a/thinking.cfm?redirect=#URLEncodedFormat(outURLConnected)#">#Total_Calls#</a>
 										</div><div class="list-block column-3 data-cell">
-											<a href="">#Sales_Opps#</a>
+											<a href="../platform_a/thinking.cfm?redirect=#URLEncodedFormat(Sales_Opps)#">#Sales_Opps#</a>
 										</div><div class="list-block column-4 data-cell">
-											<a href="">#Booked_Appt#</a>
+											<a href="../platform_a/thinking.cfm?redirect=#URLEncodedFormat(Booked_Appt)#">#Booked_Appt#</a>
 										</div>
 									</div>
 								</div>
@@ -1396,74 +1388,52 @@ select {
 						</a>
 					</div>
 				</li>
+
+
+				<cfoutput query ='pull_adgroups'>
+
+						<!-- Connected Calls -->
+							<cfset outURLConnected="../cx/clickthrough.cfm?">
+							<cfset outURLConnected=outURLConnected&'this_start='&#URLEncodedFormat(this_start)#>
+							<cfset outURLConnected=outURLConnected&'&this_end='&#URLEncodedFormat(this_end)#>
+							<cfset outURLConnected=outURLConnected&'&WSC_dpid='&#URLEncodedFormat(siteID)#>
+							<cfset outURLConnected=outURLConnected&'&WSC_adgroup='&#URLEncodedFormat(Adword_groups)#>
+						<!-- Sales Opps -->
+							<cfset outURLSales="../cx/clickthrough.cfm?">
+							<cfset outURLSales=outURLSales&'this_start='&#URLEncodedFormat(this_start)#>
+							<cfset outURLSales=outURLSales&'&this_end='&#URLEncodedFormat(this_end)#>
+							<cfset outURLSales=outURLSales&'&WSC_dpid='&#URLEncodedFormat(siteID)#>
+							<cfset outURLSales=outURLSales&'&WSC_hco='&#URLEncodedFormat(sales_opp_hco)#>
+							<cfset outURLSales=outURLSales&'&WSC_adgroup='&#URLEncodedFormat(Adword_groups)#>
+
+						<!-- Appt Requests -->
+							<cfset outURLBooked="../cx/clickthrough.cfm?">
+							<cfset outURLBooked=outURLBooked&'this_start='&#URLEncodedFormat(this_start)#>
+							<cfset outURLBooked=outURLBooked&'&this_end='&#URLEncodedFormat(this_end)#>
+							<cfset outURLBooked=outURLBooked&'&WSC_dpid='&#URLEncodedFormat(siteID)#>
+							<cfset outURLBooked=outURLBooked&'&WSC_hco='&#URLEncodedFormat(booked_appt_hco)#>
+							<cfset outURLBooked=outURLBooked&'&WSC_adgroup='&#URLEncodedFormat(Adword_groups)#>
+
 				<li class="staff3-list-row">
 					<div class="list-block column-1">
-						<p class="lename">Ad Source 1</p>
+						<p class="lename">#Adword_groups#</p>
 					</div><div class="list-block column-2 data-cell">
-						<a href="">26</a>
+						<a href="../platform_a/thinking.cfm?redirect=#URLEncodedFormat(outURLConnected)#">#Total_Calls#</a>
 					</div><div class="list-block column-3 data-cell">
-						<a href="">16</a>
+						<a href="../platform_a/thinking.cfm?redirect=#URLEncodedFormat(Sales_Opps)#">#Sales_Opps#</a>
 					</div><div class="list-block column-4 data-cell">
-						<a href="">10</a>
-					</div>
-				</li><li class="staff3-list-row">
-					<div class="list-block column-1">
-						<p class="lename">Ad Source 2</p>
-					</div><div class="list-block column-2 data-cell">
-						<a href="">25</a>
-					</div><div class="list-block column-3 data-cell">
-						<a href="">11</a>
-					</div><div class="list-block column-4 data-cell">
-						<a href="">14</a>
-					</div>
-				</li><li class="staff3-list-row">
-					<div class="list-block column-1">
-						<p class="lename">Ad Source 3</p>
-					</div><div class="list-block column-2 data-cell">
-						<a href="">22</a>
-					</div><div class="list-block column-3 data-cell">
-						<a href="">12</a>
-					</div><div class="list-block column-4 data-cell">
-						<a href="">10</a>
-					</div>
-				</li><li class="staff3-list-row">
-					<div class="list-block column-1">
-						<p class="lename">Ad Source 4</p>
-					</div><div class="list-block column-2 data-cell">
-						<a href="">18</a>
-					</div><div class="list-block column-3 data-cell">
-						<a href="">12</a>
-					</div><div class="list-block column-4 data-cell">
-						<a href="">6</a>
-					</div>
-				</li><li class="staff3-list-row">
-					<div class="list-block column-1">
-						<p class="lename">Ad Source 5</p>
-					</div><div class="list-block column-2 data-cell">
-						<a href="">18</a>
-					</div><div class="list-block column-3 data-cell">
-						<a href="">12</a>
-					</div><div class="list-block column-4 data-cell">
-						<a href="">6</a>
-					</div>
-				</li><li class="staff3-list-row">
-					<div class="list-block column-1">
-						<p class="lename">Ad Source 6</p>
-					</div><div class="list-block column-2 data-cell">
-						<a href="">18</a>
-					</div><div class="list-block column-3 data-cell">
-						<a href="">12</a>
-					</div><div class="list-block column-4 data-cell">
-						<a href="">6</a>
+						<a href="../platform_a/thinking.cfm?redirect=#URLEncodedFormat(Booked_Appt)#">#Booked_Appt#</a>
 					</div>
 				</li>
+				</cfoutput>
 			</ul>
 			<div class="bottom-menu">
 				<div class="full-list-btn">
-					<a class="full-list-btn-desktop" target="_blank" href="../platform_a/pods/wsc_training_report_ad_group.cfm"><img src="../images/redux/icon_full_list.png"><span>Full List</span></a>
+					<cfoutput>
+					<a class="full-list-btn-desktop" target="_blank" href="../platform_a/pods/wsc_training_report_ad_group.cfm?this_start=#this_start#&this_end=#this_end#"><img src="../images/redux/icon_full_list.png"><span>Full List</span></a>
 					<a class="full-list-btn-mobile" href=""><img src="../images/redux/icon_full_list.png"><span>Full List</span></a>
-
-					</div>
+					</cfoutput>
+				</div>
 				<div class="list-pagination">
 					<a class="list3-prev-btn" href="" onclick="return false;"><img src="../images/redux/performance-report-cw/prev-arrow-2.png"/>
 					</a><div class="staff3-list-page">
