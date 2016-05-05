@@ -4,7 +4,7 @@
 <head>
 
 	<meta name="description" content="Call measurement solutions powered by Century Interactive">
-	<meta name="keywords" content="call measurement, call tracking, cms, callmeasurement, pay-per-call, pay per call, marketing, marketing roi, marketing return on investment, advertising roi, advertising return on investment">
+	<meta name="keywords" content="call measurement, call tracking, cms, GIT_variable_CM, pay-per-call, pay per call, marketing, marketing roi, marketing return on investment, advertising roi, advertising return on investment">
 	<meta http-equiv="X-UA-Compatible" content="IE=9">
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<!--- Client side cache prevention --->
@@ -378,23 +378,23 @@
 							<cfquery name='pull_groups' datasource='#application.ds#'>
 								SELECT
 									ISNULL(a.Ad_Group_Name,'Unnamed Group') as 'Adword_groups',
-									COUNT(distinct c.callid) as Total_Calls,
-									COUNT(distinct case when frn_hcat_optionid in (#sales_opp_hco#) then c.callid else null end) AS Sales_Opps,
-									COUNT(distinct case when frn_hcat_optionid in (#booked_appt_hco#) then c.callid else null end) AS Booked_Appt
+									COUNT(distinct c.GIT_ID_for_call) as Total_Calls,
+									COUNT(distinct case when GIT_frn_id_of_humanatic_call_review_question in (#sales_opp_hco#) then c.GIT_ID_for_call else null end) AS Sales_Opps,
+									COUNT(distinct case when GIT_frn_id_of_humanatic_call_review_question in (#booked_appt_hco#) then c.GIT_ID_for_call else null end) AS Booked_Appt
 								FROM #theTable# c
-									INNER JOIN dnis d ON c.cf_frn_dnisid = d.dnisid and add_lskinid = <cfqueryparam value="#session.callmeasurement_lskin#" CFSQLType="CF_SQL_INTEGER">
-									INNER JOIN lskin l on d.add_lskinid = l.lskinid
-									INNER JOIN #archive#adwords_call_#dpdtable.category# a ON a.frn_callid = c.callid
-									LEFT JOIN #theTable#_hcat ch on ch.frn_callid = c.callid
-									LEFT JOIN xdnispool xdp on d.poolmaster = xdp.dnispoolid
+									FROM GIT_table_that_holds_numbers d ON c.cf_frn_GIT_PhNumid = d.GIT_PhNumid and add_FROM GIT_account = <cfqueryparam value="#session.GIT_variable_CM_lskin#" CFSQLType="CF_SQL_INTEGER">
+									FROM GIT_table_that_holds_accounts l on d.add_FROM GIT_account = l.FROM GIT_account
+									INNER JOIN #archive#adwords_call_#dpdtable.category# a ON a.frn_GIT_ID_for_call = c.GIT_ID_for_call
+									LEFT JOIN #theTable#_hcat ch on ch.frn_GIT_ID_for_call = c.GIT_ID_for_call
+									FROM GIT_table_that_holds_groups_of_rotating_numbers xdp on d.poolmaster = xdp.GIT_PhNumpoolid
 								WHERE
-									c.tz_date >= #createodbcdate(this_start)#
-									AND c.tz_date < #createodbcdate(this_end)#
+									c.GIT_the_date >= #createodbcdate(this_start)#
+									AND c.GIT_the_date < #createodbcdate(this_end)#
 									AND poolmaster = #siteID#
 								   AND a.campaign_name = '#AdWords_Campaign#'
 									AND c.spamrating = 0
 								GROUP BY a.Ad_Group_Name
-								ORDER BY count(distinct c.callid) desc
+								ORDER BY count(distinct c.GIT_ID_for_call) desc
 							</cfquery>
 
 
