@@ -342,13 +342,13 @@
 		
 			<li class="staff3-list-row">
 				<div class="list-block column-1">
-					<p class="lename">Ad Source 1</p>
+					<p class="lename">#Adword_groups#</p>
 				</div><div class="list-block column-2 data-cell">
 						<a href="../thinking.cfm?redirect=#URLEncodedFormat(outURLConnected)#">#Total_Calls#</a>
 				</div><div class="list-block column-3 data-cell">
-						<a href="../thinking.cfm?redirect=#URLEncodedFormat(Sales_Opps)#">#Sales_Opps#</a>
+						<a href="../thinking.cfm?redirect=#URLEncodedFormat(outURLSales)#">#Sales_Opps#</a>
 				</div><div class="list-block column-4 data-cell">
-						<a href="../thinking.cfm?redirect=#URLEncodedFormat(Booked_Appt)#">#Booked_Appt#</a>
+						<a href="../thinking.cfm?redirect=#URLEncodedFormat(outURLBooked)#">#Booked_Appt#</a>
 				</div>
 			</li>
 		</cfoutput>
