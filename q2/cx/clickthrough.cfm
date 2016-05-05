@@ -180,6 +180,10 @@
 	</cfif>
 	
 	<!--- Website Calls --->
+	<cfif !isdefined('additions')>
+		<cfset additions = ''>
+	</cfif>
+	
 	<cfif isDefined("URL.webref") AND URL.webref NEQ ''>
 		<cfset additions = 'webref='&#URL.webref# >
 	</cfif>
@@ -191,9 +195,35 @@
 		<cfset additions = 'paid='&#URL.paid#>
 	</cfif>
 	<!---WSC--->
-	<cfif isdefined('WSC_source')>
+	<cfif isdefined("URL.WSC_source")>
 		<cfset additions = 'WSC_source='&#WSC_source#>
 	</cfif>
+	
+	<cfif isdefined("URL.UTM_source")>
+		<cfset additions = additions & '&UTM_source='&#UTM_source#>
+	</cfif>
+	
+	<cfif isdefined("URL.WSC_campaign")>
+		<cfset additions = additions & '&WSC_campaign='&#WSC_campaign#>
+	</cfif>
+	
+	<cfif isdefined("URL.WSC_adgroup")>
+		<cfset additions = additions & '&WSC_adgroup='&#WSC_adgroup#>
+	</cfif>
+	
+	<cfif isdefined("URL.WSC_Campaign_and_Adword")>
+		<cfset additions = additions & '&WSC_Campaign_and_Adword='&#WSC_Campaign_and_Adword#>
+	</cfif>
+	
+	<cfif isdefined("URL.WSC_hco")>
+		<cfset additions = additions & '&WSC_HCO='&#WSC_hco#>
+	</cfif>
+	
+	<cfif isdefined("URL.WSC_dpid")>
+		<cfset additions = additions & '&WSC_dpid='&#WSC_dpid#>
+	</cfif>
+	
+	
 	
 	
 	<!--- Special Dnis Vendors --->
