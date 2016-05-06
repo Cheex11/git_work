@@ -47,12 +47,8 @@
 	<cfquery datasource="#GIT_protected_system_variable#" name="pull_calldata">
 	SELECT  
 		GIT_ID_for_call as 'Caller''s Phone Number', 
-		CONVERT(VARCHAR(20), cl.GIT_the_datetime, 120) as 'CallStartTime',
-		(cld.leminutes_precise * 60) as 'Duration',
-		CASE WHEN LEFT(convert(varchar, tz_time, 108),2)>12 
-				THEN convert(varchar, CAST(LEFT(convert(varchar, tz_time, 108),2) as INT)-12)
-				ELSE LEFT(convert(varchar, tz_time, 108),2) END 
-				+ RIGHT(convert(varchar, tz_time, 108),6 ) + ' ' + RIGHT(convert(varchar, tz_time, 100), 2) as Time,
+		CONVERT(VARCHAR(20), cl.GIT_the_datetime, 120) as 'Call Start Time',
+		(cld.leminutes_precise * 60) as 'Call Duration (seconds)',
 		CASE 
 			WHEN 
 				cl.frn_FROM GIT_table_that_holds_call_data_dispositionid=1 AND cld.leminutes_precise>=5 AND spamrating=0 
@@ -68,7 +64,7 @@
 				AND ISNULL(r.GIT_PhNum_label, 0) <> 'GIT_Legacy_Filter_Code' )
 				OR r.GIT_PhNum_label IS NULL)
 			THEN 'Qualified Call'
-			ELSE '' END as 'Resolution Indicator'
+			ELSE '' END as 'Conversion Name'
 	FROM GIT_variable_CM.dbo.GIT_PhNum AS d
 		INNER JOIN #thetable# AS cl ON cl.cf_frn_GIT_PhNumid = d.GIT_PhNumid
 		INNER JOIN #thetable#_details AS cld ON cl.GIT_ID_for_call = cld.frn_GIT_ID_for_call
@@ -86,22 +82,26 @@
 	ORDER BY CONVERT(VARCHAR(20), cl.GIT_the_datetime, 120)
 	</cfquery>
 	
-<cfif IsDefined("debug")>
-<cfoutput>#timeFormat(now(),'h:mm:ss:l')# finished query  <br /></cfoutput>
-<cfdump var="#pull_calldata#" expand="no" top="20" >
-</cfif>
-		<!--- prepare the file --->
-		<cfset yopath = "#application.masterpath#/platform_a/execute/files/SF_monthly_reports" />
-		<cfset acfile = "#filename#_#Dateformat(GIT_begin_date, 'yyyy_mm')#.csv" />
-		<cfset TempFile = "#yopath#/#acfile#">
+	
+	<cfset yopath = "#application.masterpath#/platform_a/execute/files/SF_monthly_reports" />
+	<cfset acfile = "#filename#_#Dateformat(GIT_begin_date, 'yyyy_mm')#.csv" />
+	<cfset TempFile = "#yopath#/#acfile#">
+     
+<cfscript> 
+    
+    //Create two empty ColdFusion spreadsheet objects. ---> 
+    theSheet = SpreadsheetNew("data"); 
+    //Populate each object with a query. ---> 
+    SpreadsheetAddRow(theSheet,"Parameters:TimeZone=0400;",1,1); 
+    SpreadsheetAddRow(theSheet,"Caller''s Phone Number,Call Start Time,Call Duration (seconds),Conversion Name",2,1); 
+    SpreadsheetAddRows(theSheet,pull_calldata,3,1); 
+</cfscript> 
+ 
+<!--- Write the two sheets to a single file ---> 
+<cfspreadsheet action="write" filename="#TempFile#" name="theSheet"  
+    sheetname="courses" overwrite=true> 
+	
 
-
-		<cfif FileExists(TempFile)>
-			<cffile action="delete" file="#TempFile#" >
-		</cfif>
-
-		<cfset fastFileWriter = createObject("java", "FastResultsetToFile")>
-		<cfset fastFileWriter.exportResultsetToFile(pull_calldata, "#TempFile#", ',', "UTF-8")>	
 <!--- --->
 <cfif isDefined("URL.debug")>
 <cfoutput>#timeFormat(now(),'h:mm:ss:l')# finished output  <br /></cfoutput>
@@ -127,7 +127,7 @@
 		<span style="font-size: 13pt;"><cfoutput><a href="files/SF_monthly_reports/#acfile#" target="_blank"><u>#acfile#</u></a></cfoutput></span>
 	<cfelse>
 		No data available for this time period.
-		<cfmail from="no-reply@GIT_variable_CM.com" to="jian@hackerfarm.com" subject="Alert: SF monthly report empty!!">
+		<cfmail from="no-reply@GIT_variable_CM.com" to="GIT_email_in_report" subject="Alert: SF monthly report empty!!">
 			platform_a/execute/SF_monthly_auto_MarchexVoiceSearch.cfm
 		
 			<cfdump var="#pull_calldata#">
@@ -135,10 +135,9 @@
 		</cfmail>
 
 	</cfif>
-<cfoutput><br/>end page: #now()#</cfoutput>
-
-
+<cfoutput><br/>end page: #now()#</cfoutput>	
+	
 <cfcatch>
-	<cfdump var="#cfcatch#" />
+	<cfdump var='#cfcatch#'>
 </cfcatch>
 </cftry>
