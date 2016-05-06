@@ -46,34 +46,29 @@
 
 	<cfquery datasource="#GIT_protected_system_variable#" name="pull_calldata">
 	SELECT  
-		d.leGIT_PhNum as Number,
-		count(distinct cl.GIT_ID_for_call) as 'Total Calls',
-		sum(CASE WHEN 
-				cl.frn_FROM GIT_table_that_holds_call_data_dispositionid=1 
-				AND cld.leminutes_precise>=1 
-				AND spamrating=0 
+		GIT_ID_for_call as 'Caller''s Phone Number', 
+		CONVERT(VARCHAR(20), cl.GIT_the_datetime, 120) as 'CallStartTime',
+		(cld.leminutes_precise * 60) as 'Duration',
+		CASE WHEN LEFT(convert(varchar, tz_time, 108),2)>12 
+				THEN convert(varchar, CAST(LEFT(convert(varchar, tz_time, 108),2) as INT)-12)
+				ELSE LEFT(convert(varchar, tz_time, 108),2) END 
+				+ RIGHT(convert(varchar, tz_time, 108),6 ) + ' ' + RIGHT(convert(varchar, tz_time, 100), 2) as Time,
+		CASE 
+			WHEN 
+				cl.frn_FROM GIT_table_that_holds_call_data_dispositionid=1 AND cld.leminutes_precise>=5 AND spamrating=0 
 				AND ((r.GIT_PhNum_label NOT LIKE '%unrecognized%'
-						AND (r.GIT_PhNum_label LIKE 'Agent - %' 
-						OR r.GIT_PhNum_label LIKE '%CCC-Sales%'  
-						OR ISNUMERIC(LEFT(r.GIT_PhNum_label,5))=1 
-				OR r.GIT_PhNum_label = 'Toll Free Catch All') 
+				AND (r.GIT_PhNum_label LIKE 'Agent - %' OR r.GIT_PhNum_label LIKE '%CCC-Sales%'  OR ISNUMERIC(LEFT(r.GIT_PhNum_label,5))=1 OR r.GIT_PhNum_label = 'Toll Free Catch All') 
+				AND ISNULL(r.GIT_PhNum_label, 0) <> 'GIT_Legacy_Filter_Code' )
+				OR r.GIT_PhNum_label IS NULL) 
+			THEN 'Prospect Call'
+			WHEN 
+				cl.frn_FROM GIT_table_that_holds_call_data_dispositionid=1 AND cld.leminutes_precise>=1 AND spamrating=0 
+				AND ((r.GIT_PhNum_label NOT LIKE '%unrecognized%'
+				AND (r.GIT_PhNum_label LIKE 'Agent - %' OR r.GIT_PhNum_label LIKE '%CCC-Sales%'  OR ISNUMERIC(LEFT(r.GIT_PhNum_label,5))=1 OR r.GIT_PhNum_label = 'Toll Free Catch All') 
 				AND ISNULL(r.GIT_PhNum_label, 0) <> 'GIT_Legacy_Filter_Code' )
 				OR r.GIT_PhNum_label IS NULL)
-			THEN 1 
-			ELSE 0 END) as 'Qualified Calls', 
-		sum(CASE WHEN 
-				cl.frn_FROM GIT_table_that_holds_call_data_dispositionid=1 
-				AND cld.leminutes_precise>=5 
-				AND spamrating=0 
-				AND ((r.GIT_PhNum_label NOT LIKE '%unrecognized%'
-					AND (r.GIT_PhNum_label LIKE 'Agent - %' 
-					OR r.GIT_PhNum_label LIKE '%CCC-Sales%'  
-					OR ISNUMERIC(LEFT(r.GIT_PhNum_label,5))=1 
-				OR r.GIT_PhNum_label = 'Toll Free Catch All') 
-					AND ISNULL(r.GIT_PhNum_label, 0) <> 'GIT_Legacy_Filter_Code' )
-					OR r.GIT_PhNum_label IS NULL)
-			THEN 1 
-			ELSE 0 END) as 'Prospect Calls'
+			THEN 'Qualified Call'
+			ELSE '' END as 'Resolution Indicator'
 	FROM GIT_variable_CM.dbo.GIT_PhNum AS d
 		INNER JOIN #thetable# AS cl ON cl.cf_frn_GIT_PhNumid = d.GIT_PhNumid
 		INNER JOIN #thetable#_details AS cld ON cl.GIT_ID_for_call = cld.frn_GIT_ID_for_call
@@ -85,10 +80,10 @@
 		FROM GIT_table_holding_web_sessions_action_call_long a ON a.frn_GIT_ID_for_call = cl.GIT_ID_for_call
 		FROM GIT_table_holding_web_sessions_external_id_long e ON a.frn_dpdid = e.frn_dpdid
 	WHERE
-			cl.GIT_the_date >= #createODBCDate(GIT_begin_date)#
-			AND cl.GIT_the_date < #createODBCDate(GIT_finish_date)#
-			and d.leGIT_PhNum in (#replace(this_GIT_PhNum_list,'"',"'","all")#)
-	GROUP BY d.leGIT_PhNum
+		cl.GIT_the_date >= #createODBCDate(GIT_begin_date)#
+		AND cl.GIT_the_date < #createODBCDate(GIT_finish_date)#
+		and d.leGIT_PhNum in (#replace(this_GIT_PhNum_list,'"',"'","all")#)
+	ORDER BY CONVERT(VARCHAR(20), cl.GIT_the_datetime, 120)
 	</cfquery>
 	
 <cfif IsDefined("debug")>
@@ -121,11 +116,11 @@
 			</cfmail>
 			Email sent. <br/><br/>
 			
-			<!---
+			
 			<cfquery datasource="#GIT_protected_system_variable#">
-			UPDATE alarm SET lastcomplete=getdate() WHERE GIT_alertid = 211
+			UPDATE alarm SET lastcomplete=getdate() WHERE GIT_alertid = 682
 			</cfquery>
-			--->
+			
 		</cfif>
 		
 		<img src="../../images/excel.jpg" border="0" /> &nbsp; 
