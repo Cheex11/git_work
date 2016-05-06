@@ -285,7 +285,7 @@ AND listContains(session.cx_hco,'91273')>
 		select CASE WHEN ISNUMERIC(theani) = 1 THEN CAST(theani AS bigINT) ELSE 0 END AS theani,max(GIT_the_datetime) as calledBack
 		from #thetable# xc
 		FROM GIT_table_holding_phone_numbers d on xc.cf_frn_GIT_PhNumid=d.GIT_PhNumid
-		INNER JOIN calllog_ani a on a.calllog_aniid=xc.frn_calllog_aniid
+		FROM GIT_table_holds_caller_ph_numbers a on a.calllog_aniid=xc.frn_calllog_aniid
 		where add_FROM GIT_account=<cfqueryParam value="#session.GIT_variable_CM_lskin#" CFSQLType = 'CF_SQL_INTEGER'>
 		AND GIT_the_date >=<cfqueryParam value="#SESSION.cx_date_start#" CFSQLType = 'CF_SQL_DATE'>
 		AND GIT_the_date <=getdate()
@@ -310,7 +310,7 @@ AND listContains(session.cx_hco,'91273')>
 		from #thetable# xc
 		FROM GIT_table_holding_phone_numbers d on xc.cf_frn_GIT_PhNumid=d.GIT_PhNumid
 		INNER JOIN #thetable#_hcat xh on xh.frn_GIT_ID_for_call=xc.GIT_ID_for_call AND GIT_frn_id_of_humanatic_call_review_question in (<cfqueryParam value="#session.ex_hco#" list="yes" CFSQLType = 'CF_SQL_INTEGER'>)
-		INNER JOIN calllog_ani a on a.calllog_aniid=xc.frn_calllog_aniid
+		FROM GIT_table_holds_caller_ph_numbers a on a.calllog_aniid=xc.frn_calllog_aniid
 		where add_FROM GIT_account=<cfqueryParam value="#session.GIT_variable_CM_lskin#" CFSQLType = 'CF_SQL_INTEGER'>
 		AND GIT_the_date >=<cfqueryParam value="#SESSION.cx_date_start#" CFSQLType = 'CF_SQL_DATE'>
 		AND GIT_the_date <=<cfqueryParam value="#SESSION.cx_date_end#" CFSQLType = 'CF_SQL_DATE'>
