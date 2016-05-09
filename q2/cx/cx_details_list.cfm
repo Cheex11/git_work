@@ -188,6 +188,16 @@
 	<cfset hcat_extensions = ArrayToList(ListToArray(ValueList(pull_GIT_PhNum_hcat.frn_extension_GIT_PhNumid)))>
 </cfif>
 
+<cfif isdefined('WSC_source') or isdefined('WSC_campaign')>
+	<cfset archive = "" />
+	<cfif dpdtable.category EQ 'ShortLong'>
+		<cfset archive = 'vw'>
+	</cfif>
+	<cfif DateDiff("d", SESSION.cx_date_start, now() ) gt 45>
+		<cfset archive = "archive.dbo." />
+	</cfif>
+</cfif>
+
 <cfif isdefined('WSC_source')>
 	<cfquery name='pull_wsc_calls_with_source' datasource='#application.ds#'>
 		select
@@ -219,9 +229,8 @@
 			GIT_ID_for_call
 		FROM #theTable# c
 			FROM GIT_table_that_holds_numbers d ON c.cf_frn_GIT_PhNumid = d.GIT_PhNumid and add_FROM GIT_account = <cfqueryparam value="#session.GIT_variable_CM_lskin#" CFSQLType="CF_SQL_INTEGER">
-			<cfif isdefined('siteID')>
 			FROM GIT_table_that_holds_accounts l on d.add_FROM GIT_account = l.FROM GIT_account
-			FROM GIT_table_holding_calls_from_adwords_#dpdtable.category# a ON a.frn_GIT_ID_for_call = c.GIT_ID_for_call         
+			INNER JOIN #archive#FROM GIT_table_that_holds_call_data_#dpdtable.category#_adwords a ON a.frn_GIT_ID_for_call = c.GIT_ID_for_call         
 			LEFT JOIN #theTable#_hcat ch on ch.frn_GIT_ID_for_call = c.GIT_ID_for_call
 			FROM GIT_table_that_holds_groups_of_rotating_numbers xdp on d.poolmaster = xdp.GIT_PhNumpoolid
 		WHERE c.GIT_the_date >= #createodbcdate(SESSION.cx_date_start)# 
@@ -244,9 +253,8 @@
 			GIT_ID_for_call
 		FROM #theTable# c
 			FROM GIT_table_that_holds_numbers d ON c.cf_frn_GIT_PhNumid = d.GIT_PhNumid and add_FROM GIT_account = <cfqueryparam value="#session.GIT_variable_CM_lskin#" CFSQLType="CF_SQL_INTEGER">
-			<cfif isdefined('siteID')>
 			FROM GIT_table_that_holds_accounts l on d.add_FROM GIT_account = l.FROM GIT_account
-			FROM GIT_table_holding_calls_from_adwords_#dpdtable.category# a ON a.frn_GIT_ID_for_call = c.GIT_ID_for_call         
+			INNER JOIN #archive#FROM GIT_table_that_holds_call_data_#dpdtable.category#_adwords a ON a.frn_GIT_ID_for_call = c.GIT_ID_for_call         
 			LEFT JOIN #theTable#_hcat ch on ch.frn_GIT_ID_for_call = c.GIT_ID_for_call
 			FROM GIT_table_that_holds_groups_of_rotating_numbers xdp on d.poolmaster = xdp.GIT_PhNumpoolid
 		WHERE c.GIT_the_date >= #createodbcdate(SESSION.cx_date_start)# 
