@@ -1,0 +1,16 @@
+--1. The corporate bit will be turned on behind the scenes for anyone that is an Admin user of a Master and for multi-account users.
+
+--Find multiclient users
+select distinct GIT_column_linking_users, count(distinct l.frn_FROM GIT_account)
+from GIT_user l
+	inner join hproduct_lskin hl on hl.frn_FROM GIT_account = l.frn_FROM GIT_account and hl.GIT_verticalID = 2
+group by GIT_column_linking_users
+having count(*) > 1
+
+--Find admin users of master
+select distinct GIT_userID
+from GIT_user u
+	inner join lskin l on l.FROM GIT_account = l.FROM GIT_account
+	inner join hproduct_lskin hl on hl.frn_FROM GIT_account = u.frn_FROM GIT_account and hl.GIT_verticalID = 2
+where GIT_user_typeID_column = 1
+	and l.FROM GIT_account = l.masterlskin
