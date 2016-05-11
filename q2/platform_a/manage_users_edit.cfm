@@ -1,6 +1,7 @@
 <cfinclude template="header.cfm" />
 
 	<script>console.log(<cfif isDefined("FORM.adminCheckVal")><cfoutput>"#FORM.adminCheckVal#"</cfoutput>+ </cfif>"hi");</script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
 
 <cfif not isdefined("lid")>
 	<cflocation url="manage_users.cfm" addtoken = "no">
@@ -569,9 +570,27 @@ var httpObject = null;
 		<cfif pull_this.GIT_user_typeID_column EQ 2>
 			<tr><td colspan="2"><input type="checkbox" name="access_admin" value="1" id="adminCheck" <cfif pull_this.access_admin EQ 1>checked</cfif>>&nbspGive user admin access</td></tr>
 			<tr><td height="35">&nbsp;</td></tr>
+			
+			<cfif isdefined('cody')>
+				<tr><td colspan="2"><input type="checkbox" onClick="toggle(this)" /> Select All</td></tr>
+				<tr><td height="35">&nbsp;</td></tr>
+				
+				<script>
+					function toggle(source) {
+					  checkboxes = document.getElementsByName('uskin');
+					  for(var i=0, n=checkboxes.length;i<n;i++) {
+						checkboxes[i].checked = source.checked;
+					  }
+					}
+				</script>
+			</cfif>
+		
+		
 		<cfelse>
 			<input type="hidden" name="access_admin" value="on" />
 		</cfif>
+		
+		
 	<cfelse>
 
 		<cfif access_all EQ 0 OR access_all IS "">
@@ -634,6 +653,8 @@ var httpObject = null;
 			Client account associations:
 		</td>
 		</tr>
+		
+		
 
 		<cfloop query="pull_lskin">
 			<tr>
@@ -642,6 +663,8 @@ var httpObject = null;
 			</td>
 			</tr>
 		</cfloop>
+		
+		
 
 		<tr><td>&nbsp;</td></tr>
 
@@ -825,7 +848,7 @@ var httpObject = null;
 			<td colspan="2">
 				<div class="pc-admin-options">
 					<div class="pc-checkbox-holder">
-						<input id="pc-existing-radio" class="pcradio" type="radio" name="pcradio" value='associate_phonecode'/>
+						<input id="pc-existing-radio" class="pcradio" type="radio" name="pcradio" value='associate_phonecode'>
 						<label for="pc-existing-radio">
 							<div class="pc-checkbox"><div></div></div>
 							<div class="pc-checkbox-label">Associate this user with an existing phonecode</div>
@@ -833,13 +856,13 @@ var httpObject = null;
 					</div>
 
 					<div class="existing-phonecode-select">
-						<select name='associate_with'>
+						<select id='associate_with' name='associate_with'>
 							<cfif pull_current_phonecode.recordCount GT 0>
 								<cfoutput>
 									<cfquery name ='pull_current_dialcode' datasource='GIT_variable_CM'>
 										SELECT dialcode, lename from phonecode where phonecodeid = #pull_current_phonecode.frn_phonecodeid#
 									</cfquery>
-									<option value="">-- Currently #pull_current_dialcode.dialcode# (#pull_current_dialcode.lename#) --</option>
+									<option value="configured">-- Currently #pull_current_dialcode.dialcode# (#pull_current_dialcode.lename#) --</option>
 								</cfoutput>
 							<cfelse>
 								<option value="">-- select phonecode --</option>
@@ -850,6 +873,19 @@ var httpObject = null;
 							</cfloop>
 						</select>
 					</div>
+					
+					<cfif isdefined('cody')>
+						<script>
+							$( document ).ready(function() {
+								selected = $( "##associate_with" ).val();
+								console.log(selected);
+								if (selected == 'configured') {
+									$('.existing-phonecode-select').css("display", "block");
+									$('##pc-existing-radio').attr('checked',true);
+								}
+							});
+						</script>
+					</cfif>
 
 					<div class="pc-checkbox-holder">
 						<input id="pc-new-radio" class="pcradio" type="radio" name="pcradio" value='create_phonecode'/>
@@ -909,6 +945,7 @@ var httpObject = null;
 							AND l.isactive=1
 							AND GIT_column_linking_users=<cfqueryParam value="#session.GIT_variable_CM_GIT_column_linking_users#" cfsqltype="cf_sql_integer">
 							AND FROM GIT_account <><cfqueryParam value="#session.GIT_variable_CM_lskin#" cfsqltype="cf_sql_integer">
+							Order by refname
 						</cfquery>
 						
 						<div class="account-list-box">
@@ -917,8 +954,10 @@ var httpObject = null;
 									<input type="checkbox" class="top-dog" name='AllAccounts'>
 									<label>Select All Accounts</label>
 								</div>
+								
+								
+								
 								<div class="box-top-cell-2">
-
 								</div>
 							</div>
 							<div class="box-bottom">
@@ -948,6 +987,24 @@ var httpObject = null;
 			</td>
 		</tr>
 	</cfif>
+	
+	<cfif isdefined('cody')>
+		<script>
+			$( document ).ready(function() {
+				$('.top-dog').click(function(event) {  
+					if(this.checked) { 
+						$('.lskin-id').each(function() { 
+							this.checked = true;             
+						});
+					}else{
+						$('.lskin-id').each(function() { 
+							this.checked = false;            
+						});         
+					}
+				});		
+			});									
+		</script>
+	</cfif>	
 
 	<tr>
 	<td class='submit_cell' colspan="2">
