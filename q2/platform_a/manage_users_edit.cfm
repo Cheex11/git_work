@@ -571,19 +571,7 @@ var httpObject = null;
 			<tr><td colspan="2"><input type="checkbox" name="access_admin" value="1" id="adminCheck" <cfif pull_this.access_admin EQ 1>checked</cfif>>&nbspGive user admin access</td></tr>
 			<tr><td height="35">&nbsp;</td></tr>
 			
-			<cfif isdefined('cody')>
-				<tr><td colspan="2"><input type="checkbox" onClick="toggle(this)" /> Select All</td></tr>
-				<tr><td height="35">&nbsp;</td></tr>
 				
-				<script>
-					function toggle(source) {
-					  checkboxes = document.getElementsByName('uskin');
-					  for(var i=0, n=checkboxes.length;i<n;i++) {
-						checkboxes[i].checked = source.checked;
-					  }
-					}
-				</script>
-			</cfif>
 		
 		
 		<cfelse>
@@ -654,7 +642,17 @@ var httpObject = null;
 		</td>
 		</tr>
 		
+		<tr><td colspan="2"><input type="checkbox" onClick="toggle(this)" /> Select All</td></tr>
+		<tr><td height="35">&nbsp;</td></tr>
 		
+		<script>
+			function toggle(source) {
+			  checkboxes = document.getElementsByName('uskin');
+			  for(var i=0, n=checkboxes.length;i<n;i++) {
+				checkboxes[i].checked = source.checked;
+			  }
+			}
+		</script>
 
 		<cfloop query="pull_lskin">
 			<tr>
@@ -829,7 +827,7 @@ var httpObject = null;
 				where p.frn_FROM GIT_account in (select FROM GIT_account from lskin where masterlskin = <cfqueryParam value="#session.GIT_variable_CM_lskin#" cfsqltype="cf_sql_integer">)
 				and dialcode is not null
 				and dialcode <> ''
-				and dialcode not LIKE '[A-Za-z]%'
+				and dialcode LIKE '[0-9]%'
 				and isactive = 1
 				and len(dialcode) = 4
 			)
@@ -873,20 +871,16 @@ var httpObject = null;
 							</cfloop>
 						</select>
 					</div>
-					
-					<cfif isdefined('cody')>
-						<script>
-							$( document ).ready(function() {
-								selected = $( "##associate_with" ).val();
-								console.log(selected);
-								if (selected == 'configured') {
-									$('.existing-phonecode-select').css("display", "block");
-									$('##pc-existing-radio').attr('checked',true);
-								}
-							});
-						</script>
-					</cfif>
-
+					<script>
+						$( document ).ready(function() {
+							selected = $( "##associate_with" ).val();
+							console.log(selected);
+							if (selected == 'configured') {
+								$('.existing-phonecode-select').css("display", "block");
+								$('##pc-existing-radio').attr('checked',true);
+							}
+						});
+					</script>
 					<div class="pc-checkbox-holder">
 						<input id="pc-new-radio" class="pcradio" type="radio" name="pcradio" value='create_phonecode'/>
 						<label for="pc-new-radio">
@@ -904,16 +898,13 @@ var httpObject = null;
 								WHERE n.dialcode = t.dialcode 
 								and n.dialcode is not null
 								and n.dialcode <> ''
-								and n.dialcode not LIKE '[A-Za-z]%'
+								and n.dialcode LIKE '[0-9]%'
 								and n.isactive = 1
 								and n.frn_FROM GIT_account in (select FROM GIT_account from lskin where masterlskin = <cfqueryParam value="#session.GIT_variable_CM_lskin#" cfsqltype="cf_sql_integer">)
 								and len(n.dialcode) = 4)
 						and t.dialcode is not null
 						and t.dialcode <> ''
-						and t.dialcode not LIKE '[A-Za-z]%'
-						and t.dialcode not LIKE '[ A-Za-z]%'
-						and t.dialcode not LIKE '[  A-Za-z]%'
-						and t.dialcode not LIKE '[   A-Za-z]%'
+						and t.dialcode LIKE '[0-9]%'
 						and t.isactive = 1
 						and len(t.dialcode) = 4	
 					</cfquery>
@@ -988,7 +979,6 @@ var httpObject = null;
 		</tr>
 	</cfif>
 	
-	<cfif isdefined('cody')>
 		<script>
 			$( document ).ready(function() {
 				$('.top-dog').click(function(event) {  
@@ -1004,7 +994,6 @@ var httpObject = null;
 				});		
 			});									
 		</script>
-	</cfif>	
 
 	<tr>
 	<td class='submit_cell' colspan="2">
