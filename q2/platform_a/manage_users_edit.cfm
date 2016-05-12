@@ -34,6 +34,9 @@ WHERE 	frn_FROM GIT_account = #session.GIT_variable_CM_lskin#
 
 <cfif isdefined("action")>
 
+	<cfif isdefined('associate_with') and associate_with NEQ 'configured'>
+
+
 	<!--- Were the bottom two radio button clicked? --->
 	<cfif isdefined('pcradio')>
 	
@@ -313,18 +316,21 @@ WHERE 	frn_FROM GIT_account = #session.GIT_variable_CM_lskin#
 
 	</cfif>
 	<!--- /access --->
+	</cfif>
 
-
-	<cfif isdefined("uskin")>
+<cfif isdefined("uskin")>
 
 		<cfquery datasource="#GIT_protected_system_variable#" name="pull_lskin">
-		SELECT	FROM GIT_account, refname, GIT_userID
-		FROM	lskin s
-			 FROM GIT_table_that_holds_users u ON s.FROM GIT_account = u.frn_FROM GIT_account AND u.GIT_column_linking_users = #lid# AND u.isactive = 1
-		WHERE	s.FROM GIT_account IN (#session.GIT_variable_CM_lskin_all#)
-			AND s.FROM GIT_account <> #session.GIT_variable_CM_lskin#
-		ORDER BY refname
+			SELECT	FROM GIT_account, refname, GIT_userID
+			FROM	lskin s
+				 FROM GIT_table_that_holds_users u ON s.FROM GIT_account = u.frn_FROM GIT_account AND u.GIT_column_linking_users = #lid# AND u.isactive = 1
+			WHERE	s.FROM GIT_account IN (#session.GIT_variable_CM_lskin_all#)
+				AND s.FROM GIT_account <> #session.GIT_variable_CM_lskin#
+			ORDER BY refname
 		</cfquery>
+		
+		<cfdump var='#pull_lskin#'>
+		
 			<cfloop query="pull_lskin">
 
 				<cfif listFind(uskin,FROM GIT_account) GT 0>
@@ -374,9 +380,56 @@ WHERE 	frn_FROM GIT_account = #session.GIT_variable_CM_lskin#
 				</cfif>
 
 			</cfloop>
+	</cfif>	
 
-	</cfif>
+	<!--- This query is run after changing user information to ensure any users on PP that meet certain criteria will be shown
+			the corporate leadbox by having the GIT_user column "is_corp" set to 1.  HF Project: 5576 --->
+			<cfquery name='mark_is_corp_GIT_column_linking_users_users' datasource='#application.ds#'>
+				update GIT_user
+				SET is_corp = 1
+				where GIT_userID in ( select l.GIT_userID
+									from GIT_user l
+										inner join hproduct_lskin hl on hl.frn_FROM GIT_account = l.frn_FROM GIT_account and GIT_verticalID = 2
+									where GIT_column_linking_users in (
+													select distinct GIT_column_linking_users
+													from GIT_user l
+														inner join hproduct_lskin hl on hl.frn_FROM GIT_account = l.frn_FROM GIT_account and hl.GIT_verticalID = 2
+														inner join lskin ls on l.frn_FROM GIT_account = ls.FROM GIT_account and ls.isactive = 1
+													group by GIT_column_linking_users
+													having count(*) > 1
+														and count(distinct case when l.isactive = 1 then GIT_userID else null end)  > 1
+														and (max(lastlogged) is not null OR MAX(created) > DATEADD(dd, -14, GETDATE()))
+													)
+										and isactive = 1
+										and is_corp = 0
+										and uname not like 'temp%')								
+			</cfquery>		
 
+			<cfquery name='mark_is_corp_admin_users' datasource='#application.ds#'>
+				update GIT_user
+				SET is_corp = 1
+				where GIT_userID in	(
+										select GIT_userID
+										from GIT_user l
+										where GIT_column_linking_users in (
+														select distinct GIT_column_linking_users
+														from GIT_user l
+															inner join lskin ls on l.frn_FROM GIT_account = ls.FROM GIT_account and ls.isactive = 1
+														where masterlskin in (	select distinct masterlskin
+																				from hproduct_lskin
+																				inner join lskin l on frn_FROM GIT_account = FROM GIT_account
+																				where GIT_verticalID = 2)
+															and GIT_user_typeID_column in (1,2)
+															and GIT_column_linking_users is not null
+														group by GIT_column_linking_users
+														having (max(lastlogged) is not null OR MAX(created) > DATEADD(dd, -14, GETDATE()))
+														)
+											and isactive = 1
+											and GIT_user_typeID_column in (1,2)
+											and is_corp = 0
+											and uname not like 'temp%'
+									)																
+			</cfquery>		
 
 
 	<cfif not isdefined("error")>
@@ -656,9 +709,9 @@ var httpObject = null;
 
 		<cfloop query="pull_lskin">
 			<tr>
-			<td height="27" colspan="2">
-				<input type="checkbox" name="uskin" value="#FROM GIT_account#" <cfif GIT_userID IS NOT "">checked</cfif> />&nbsp; #refname#
-			</td>
+				<td height="27" colspan="2">
+					<input type="checkbox" name="uskin" value="#FROM GIT_account#" <cfif GIT_userID IS NOT "">checked</cfif> />&nbsp; #refname#
+				</td>
 			</tr>
 		</cfloop>
 		
